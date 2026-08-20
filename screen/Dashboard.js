@@ -64,10 +64,20 @@ const Dashboard = () => {
   //   // dispatch(fetchLatestMenu());
   // }, []);
 
-  useEffect(async () => {
-    // await fetchNewManu();
-    await dispatch(fetchCategory());
-    await dispatch(fetchMenu("starter"));
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      // await fetchNewManu();
+      if (!cancelled) {
+        await dispatch(fetchCategory());
+        await dispatch(fetchMenu("starter"));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const modalHandler = async () => {
