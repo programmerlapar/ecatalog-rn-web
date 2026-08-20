@@ -1,0 +1,12 @@
+diff --git a/node_modules/@expo/cli/build/src/start/server/metro/externals.js b/node_modules/@expo/cli/build/src/start/server/metro/externals.js
+--- a/node_modules/@expo/cli/build/src/start/server/metro/externals.js
++++ b/node_modules/@expo/cli/build/src/start/server/metro/externals.js
+@@ -19,7 +19,7 @@
+ const NODE_STDLIB_MODULES = [
+     "fs/promises",
+     ...(_module.builtinModules || // @ts-expect-error
+-    (process.binding ? Object.keys(process.binding("natives")) : []) || []).filter((x)=>!/^_|^(internal|v8|node-inspect)\/|\//.test(x) && ![
++    (process.binding ? Object.keys(process.binding("natives")) : []) || []).filter((x)=>!/^_|^(internal|v8|node-inspect)\/|^node:|\//.test(x) && ![
+             "sys"
+         ].includes(x)
+     ),
