@@ -71,7 +71,9 @@ const Dashboard = () => {
       // await fetchNewManu();
       if (!cancelled) {
         await dispatch(fetchCategory());
-        await dispatch(fetchMenu("starter"));
+        if (!cancelled) {
+          await dispatch(fetchMenu("starter"));
+        }
       }
     })();
 
