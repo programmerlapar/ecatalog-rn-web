@@ -41,5 +41,10 @@
   },
   "private": true,
   "name": "bajubayi",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "resolutions": {
+    "form-data": "^3.0.4",
+    "shell-quote": "^1.8.4",
+    "fast-xml-parser": "^4.5.4"
+  }
 }
