@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "prestart": "node scripts/ensure-native-project.js",
     "start": "expo start --dev-client",
     "android": "react-native run-android",
     "ios": "react-native run-ios",

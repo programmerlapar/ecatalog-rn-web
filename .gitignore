@@ -70,7 +70,9 @@ node_modules/
 dist/
 web-build/
 
-# Native
+# Native build outputs and generated projects
+android/
+ios/
 *.orig.*
 *.jks
 *.p8
