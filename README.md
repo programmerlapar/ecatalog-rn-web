@@ -4,6 +4,12 @@ E-Catalog React Native Web
 
 This project using React Native, React Native Web, React Router, React Reveal and Expo
 
+## Web deployment
+
+Netlify should use `yarn build:web` as its build command and publish the generated `dist`
+directory. The web build does not run the native prebuild step, so it can run in a deploy
+environment without Android or iOS toolchains.
+
 ## Native development
 
 Install Android Studio for Android development or Xcode for iOS development. The first
