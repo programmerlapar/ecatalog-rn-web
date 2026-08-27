@@ -233,7 +233,7 @@ const Dashboard = () => {
                       height: !isMobile ? _width / 8 - 20 : _width / 4 - 20,
                       marginVertical: isWeb ? 10 : null,
                     }}
-                    cid={item.strCategory.toLowerCase()}
+                    cid={item.cid}
                     onPress={() => {
                       selectedCategoryHandler(item);
                     }}
