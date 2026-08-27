@@ -221,7 +221,7 @@ const Dashboard = () => {
                   paddingLeft: isWeb ? PADDING_LEFT : null,
                 }}
                 data={availCat.categories}
-                keyExtractor={(item) => item.idCategory}
+                keyExtractor={(item) => item.cid}
                 showsHorizontalScrollIndicator={isWeb ? false : true}
                 renderItem={({ item }) => (
                   <CategoryList

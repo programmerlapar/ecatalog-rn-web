@@ -14,7 +14,7 @@ const CategoryList = ({
   item,
   selectedCategory,
 }) => {
-  const selected = selectedCategory.idCategory === item.idCategory;  
+  const selected = selectedCategory.cid === item.cid;
   return (
     <TouchableOpacity onPress={onPress}>
       <Link to={`/category/${cid}`} style={{ textDecoration: "none", flex: 1 }}>
@@ -45,7 +45,7 @@ const CategoryList = ({
               styles.text,
               {
                 fontSize,
-                color: selectedCategory.idCategory === item.idCategory ? "white" : LittleDarkAccent,
+                color: selected ? "white" : LittleDarkAccent,
               },
             ]}
           >
