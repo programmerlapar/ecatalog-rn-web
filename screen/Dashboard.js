@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Animated, FlatList, StyleSheet, Text, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Fade from "react-reveal/Fade";
 import Slide from "react-reveal/Slide";
 import BottomSheet from "../components/BottomSheet";
@@ -15,15 +15,11 @@ import priceInt, { cartTotal } from "../constant/function";
 import { HEADER_MARGIN, isMobile } from "../constant/isMobile";
 import useDimens from "../constant/useDimens";
 import data from "../data/data.json";
-import { fetchAllMenu, fetchCategory, fetchMenu } from "../store/actions/menu";
+import { categories, products, productsForCategory } from "../data/catalog";
 
 const PADDING_LEFT = "20%";
 
 const Dashboard = () => {
-  const availCat = useSelector((state) => state.menu.categoryList);
-  const availLatMenu = useSelector((state) => state.menu.latestMenu);
-  const availMenu = useSelector((state) => state.menu.availableMenu);
-  const loading = useSelector((state) => state.menu.isFetching);
   const order = useSelector((state) => state.cart.orderItems);
   const availablePromo = data.Promo;
   const [promo, setPromo] = useState(availablePromo);
@@ -49,7 +45,6 @@ const Dashboard = () => {
   const BASE_PRICE = priceInt(15000, 60000);
   const PRICE = cartTotal(BASE_PRICE);
 
-  const dispatch = useDispatch();
   const _rem = (size) => {
     if (_height > _width) {
       return ((size * _width) / 380) * 2;
@@ -64,12 +59,6 @@ const Dashboard = () => {
   //   // dispatch(fetchLatestMenu());
   // }, []);
 
-  useEffect(async () => {
-    // await fetchNewManu();
-    await dispatch(fetchCategory());
-    await dispatch(fetchMenu("starter"));
-  }, []);
-
   const modalHandler = async () => {
     setModalVisible(!modalVisible);
   };
@@ -83,12 +72,11 @@ const Dashboard = () => {
 
   const selectedCategoryHandler = (category) => {
     setSelectedCategory(category);
-    dispatch(fetchAllMenu(category.strCategory.toLowerCase()));
     setMeals(true);
   };
   return (
     <View style={{ flex: 1 }}>
-      {!loading ? (
+      <>
         <View>
           <ProductsModal
             price={BASE_PRICE}
@@ -220,7 +208,7 @@ const Dashboard = () => {
                   paddingTop: 20,
                   paddingLeft: isWeb ? PADDING_LEFT : null,
                 }}
-                data={availCat.categories}
+                data={categories}
                 keyExtractor={(item) => item.idCategory}
                 showsHorizontalScrollIndicator={isWeb ? false : true}
                 renderItem={({ item }) => (
@@ -270,7 +258,7 @@ const Dashboard = () => {
                   numColumns={isMobile ? 2 : 4}
                   // horizontal
                   // data={products.reverse().slice(0, 8)}
-                  data={availMenu.meals}
+                   data={products}
                   // data={products}
                   keyExtractor={(item, index) => item.idMeal}
                   renderItem={({ item }) => (
@@ -317,7 +305,7 @@ const Dashboard = () => {
                   scrollEnabled
                   showsVerticalScrollIndicator={false}
                   numColumns={isMobile ? 2 : 4}
-                  data={availLatMenu.meals}
+                   data={productsForCategory(selectedCategory.idCategory)}
                   keyExtractor={(item, index) => item.idMeal}
                   renderItem={({ item }) => (
                     <ProductList
@@ -338,9 +326,7 @@ const Dashboard = () => {
             )}
           </View>
         </View>
-      ) : (
-        <Loading />
-      )}
+      </>
     </View>
   );
 };
