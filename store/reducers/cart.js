@@ -8,7 +8,8 @@ export function cartReducer(state = initialState, action) {
   let orderList = [...state.orderItems];
   switch (action.type) {
     case EDIT_ORDER:
-      let item = orderList.filter((i) => i.idMeal == action.idMeal);
+      let itemIndex = orderList.findIndex((i) => i.idMeal == action.idMeal);
+      let item = itemIndex === -1 ? [] : [orderList[itemIndex]];
       let currentItem = item[0];
       if (action.action == "+") {
         if (item.length > 0) {
@@ -33,7 +34,7 @@ export function cartReducer(state = initialState, action) {
             currentItem.qty = newQty;
             currentItem.total = newQty * action.price;
           } else {
-            orderList.pop();
+            orderList.splice(itemIndex, 1);
           }
         }
       }
