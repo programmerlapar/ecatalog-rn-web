@@ -17,46 +17,42 @@ const CategoryList = ({
   const selected = selectedCategory.idCategory === item.idCategory;  
   return (
     <TouchableOpacity onPress={onPress}>
-      {/* <Link to={"/category/" + cid} style={{ textDecoration: "none", flex: 1 }}> */}
-
-      <View
-        onMouseEnter={() => {}}
-        style={[
-          styles.container,
-          {
-            ...style,
-            flex: 1,
-            backgroundColor: selected ? DarkAccent : "white",
-          },
-        ]}
-      >
-        <Image
-          // resizeMode={"contain"}
-          source={{ uri: image }}
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            width: "100%",
-            height: style.height / 2,
-            resizeMode: 'contain',
-            borderRadius: "50%",
-            // paddingBottom: _adjustSizes(40),
-            // paddingTop: _adjustSizes(40),
-          }}
-        />
-        <Text
+      <Link to={`/category/${cid}`} style={{ textDecoration: "none", flex: 1 }}>
+        <View
+          onMouseEnter={() => {}}
           style={[
-            styles.text,
+            styles.container,
             {
-              fontSize,
-              color: selectedCategory.idCategory === item.idCategory ? "white" : LittleDarkAccent
+              ...style,
+              flex: 1,
+              backgroundColor: selected ? DarkAccent : "white",
             },
           ]}
         >
-          {title}
-        </Text>
-      </View>
-      {/* </Link> */}
+          <Image
+            source={{ uri: image }}
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              width: "100%",
+              height: style.height / 2,
+              resizeMode: "contain",
+              borderRadius: "50%",
+            }}
+          />
+          <Text
+            style={[
+              styles.text,
+              {
+                fontSize,
+                color: selectedCategory.idCategory === item.idCategory ? "white" : LittleDarkAccent,
+              },
+            ]}
+          >
+            {title}
+          </Text>
+        </View>
+      </Link>
     </TouchableOpacity>
   );
 };

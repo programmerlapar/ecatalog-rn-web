@@ -267,6 +267,7 @@ const Home = (props) => {
         />
 
         <Route exact path="/" component={Dashboard} />
+        <Route path="/category/:id" component={Dashboard} />
         <Route path="/about" component={About} />
         <Route
           path="/product/:id"
