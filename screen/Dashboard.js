@@ -221,7 +221,7 @@ const Dashboard = () => {
                   paddingLeft: isWeb ? PADDING_LEFT : null,
                 }}
                 data={availCat.categories}
-                keyExtractor={(item) => item.cid}
+                keyExtractor={(item) => item.idCategory}
                 showsHorizontalScrollIndicator={isWeb ? false : true}
                 renderItem={({ item }) => (
                   <CategoryList
@@ -233,7 +233,7 @@ const Dashboard = () => {
                       height: !isMobile ? _width / 8 - 20 : _width / 4 - 20,
                       marginVertical: isWeb ? 10 : null,
                     }}
-                    cid={item.cid}
+                    idCategory={item.idCategory}
                     onPress={() => {
                       selectedCategoryHandler(item);
                     }}
