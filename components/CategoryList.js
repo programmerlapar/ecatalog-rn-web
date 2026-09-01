@@ -5,7 +5,7 @@ import { _adjustSizes } from "../constant/adjustedSizes";
 import { DarkAccent, LittleDarkAccent } from "../constant/ColorsConst";
 
 const CategoryList = ({
-  cid,
+  idCategory,
   style,
   onPress,
   image,
@@ -14,10 +14,13 @@ const CategoryList = ({
   item,
   selectedCategory,
 }) => {
-  const selected = selectedCategory.idCategory === item.idCategory;  
+  const selected = selectedCategory.idCategory === item.idCategory;
   return (
     <TouchableOpacity onPress={onPress}>
-      <Link to={`/category/${cid}`} style={{ textDecoration: "none", flex: 1 }}>
+      <Link
+        to={`/category/${idCategory}`}
+        style={{ textDecoration: "none", flex: 1 }}
+      >
         <View
           onMouseEnter={() => {}}
           style={[
@@ -45,7 +48,7 @@ const CategoryList = ({
               styles.text,
               {
                 fontSize,
-                color: selectedCategory.idCategory === item.idCategory ? "white" : LittleDarkAccent,
+                color: selected ? "white" : LittleDarkAccent,
               },
             ]}
           >
