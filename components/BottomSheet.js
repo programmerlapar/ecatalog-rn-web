@@ -30,13 +30,13 @@ const BottomSheet = ({
   let orderList = order.slice();
 
   function getCartItemsCount() {
-    let itemCount = orderList.reduce((a, b) => a + (b.qty || 0), 0);
+    let itemCount = orderList.reduce((a, b) => a + (b.quantity || 0), 0);
 
     return itemCount;
   }
 
   function getTotalPrice() {
-    let total = orderList.reduce((a, b) => a + (b.total || 0), 0);
+    let total = orderList.reduce((a, b) => a + (b.sum || 0), 0);
     return cartTotal(total);
   }
 
@@ -82,7 +82,7 @@ const BottomSheet = ({
               <FlatList
                 scrollEnabled={true}
                 data={orderList}
-                keyExtractor={(item) => item.idMeal}
+                keyExtractor={(item) => item.id}
                 renderItem={({ item, index }) => {
                   return (
                     <TouchableOpacity
@@ -107,14 +107,14 @@ const BottomSheet = ({
                           }}
                         >
                           <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.contentText}>{item.qty}</Text>
+                            <Text style={styles.contentText}>{item.quantity}</Text>
                             <Text style={styles.contentText}>
-                              {item.strMeal}
+                              {item.prodTitle}
                             </Text>
                           </View>
                           <View>
                             <Text style={styles.contentText}>
-                              Rp. {cartTotal(item.total)}
+                              Rp. {cartTotal(item.sum)}
                             </Text>
                           </View>
                         </View>
