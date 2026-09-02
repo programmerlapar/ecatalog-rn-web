@@ -1,8 +1,8 @@
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Link } from "react-router-dom";
 import { _adjustSizes } from "../constant/adjustedSizes";
 import { DarkAccent, LittleDarkAccent } from "../constant/ColorsConst";
+import { Link } from "../navigation";
 
 const CategoryList = ({
   cid,

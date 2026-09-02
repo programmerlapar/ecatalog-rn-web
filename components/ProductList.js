@@ -9,13 +9,13 @@ import {
   Easing,
   View,
 } from "react-native";
-import { Link } from "react-router-dom";
 import {
   AccentColor2,
   DarkAccent,
   LittleDarkAccent,
 } from "../constant/ColorsConst";
 import { isMobile } from "../constant/isMobile";
+import { Link } from "../navigation";
 import Slide from "react-reveal/Slide";
 import Fade from "react-reveal/Fade";
 

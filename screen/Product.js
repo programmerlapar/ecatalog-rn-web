@@ -3,11 +3,11 @@ import React, { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Fade from "react-reveal/Fade";
-import { Link } from "react-router-dom";
 import Loading from "../components/Loading";
 import { AccentColor, LittleDarkAccent, shadow } from "../constant/ColorsConst";
 import { HEADER_MARGIN } from "../constant/isMobile";
 import useDimens from "../constant/useDimens";
+import { Link } from "../navigation";
 import { fetchDetailMenu, isLoadingHandler } from "../store/actions/menu";
 
 const Product = ({ match, rem }) => {
