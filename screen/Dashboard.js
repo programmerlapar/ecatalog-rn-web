@@ -58,6 +58,13 @@ const Dashboard = () => {
     }
   };
 
+  const categories = (availCat.categories || []).map((category) => ({
+    ...category,
+    cid: category.cid ?? category.idCategory,
+    title: category.title ?? category.strCategory,
+    image_link: category.image_link ?? category.strCategoryThumb,
+  }));
+
   // const fetchNewManu = useCallback(async () => {
   //   // await dispatch(isLoadingHandler());
 
@@ -83,7 +90,7 @@ const Dashboard = () => {
 
   const selectedCategoryHandler = (category) => {
     setSelectedCategory(category);
-    dispatch(fetchAllMenu(category.strCategory.toLowerCase()));
+    dispatch(fetchAllMenu(category.title.toLowerCase()));
     setMeals(true);
   };
   return (
@@ -220,20 +227,20 @@ const Dashboard = () => {
                   paddingTop: 20,
                   paddingLeft: isWeb ? PADDING_LEFT : null,
                 }}
-                data={availCat.categories}
-                keyExtractor={(item) => item.idCategory}
+                data={categories}
+                keyExtractor={(item) => item.cid}
                 showsHorizontalScrollIndicator={isWeb ? false : true}
                 renderItem={({ item }) => (
                   <CategoryList
                     fontSize={isWeb ? _rem(8) : _rem(5)}
-                    title={item.strCategory.toUpperCase()}
-                    image={item.strCategoryThumb}
+                    title={item.title.toUpperCase()}
+                    image={item.image_link}
                     style={{
                       width: !isMobile ? _width / 8 - 20 : _width / 4 - 20,
                       height: !isMobile ? _width / 8 - 20 : _width / 4 - 20,
                       marginVertical: isWeb ? 10 : null,
                     }}
-                    idCategory={item.idCategory}
+                    cid={item.cid}
                     onPress={() => {
                       selectedCategoryHandler(item);
                     }}
@@ -300,7 +307,7 @@ const Dashboard = () => {
                           color: LittleDarkAccent,
                         }}
                       >
-                        {selectedCategory.strCategory}
+                        {selectedCategory.title}
                       </Text>
                     </Slide>
                   }
