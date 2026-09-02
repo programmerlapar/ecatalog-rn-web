@@ -13,13 +13,13 @@ const Cart = ({ size, style, onPress }) => {
   let orderList = order.slice();
 
   function getCartItemsCount() {
-    let itemCount = orderList.reduce((a, b) => a + (b.quantity || 0), 0);
+    let itemCount = orderList.reduce((a, b) => a + (b.qty || 0), 0);
 
     return itemCount;
   }
 
   function getTotalPrice() {
-    let total = orderList.reduce((a, b) => a + (b.sum || 0), 0);
+    let total = orderList.reduce((a, b) => a + (b.total || 0), 0);
     return cartTotal(total);
   }
 
