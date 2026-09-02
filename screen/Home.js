@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Animated,
   Button,
@@ -35,7 +35,7 @@ const Home = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [buttonModal, setButtonModal] = useState(0);
-  const slide = new Animated.Value(drawerVisible ? -(_width / 2) : -10);
+  const slide = useRef(new Animated.Value(-10)).current;
 
   const slideAnim = () => {
     Animated.spring(slide, {
