@@ -192,6 +192,7 @@ const Dashboard = ({ categoryId }) => {
           </View>
         ) : menu.length ? (
           <FlatList
+            key={`product-grid-${columns}`}
             data={menu}
             keyExtractor={(item) => item.idMeal}
             numColumns={columns}
