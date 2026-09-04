@@ -1,88 +1,62 @@
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { _adjustSizes } from "../constant/adjustedSizes";
-import { DarkAccent, LittleDarkAccent } from "../constant/ColorsConst";
+import { Image, Platform, StyleSheet, Text, View } from "react-native";
+import { BorderColor, DarkAccent, LittleDarkAccent, SurfaceColor, shadow } from "../constant/ColorsConst";
 import { Link } from "../navigation";
 
-const CategoryList = ({
-  cid,
-  style,
-  onPress,
-  image,
-  title,
-  fontSize,
-  item,
-  selectedCategory,
-}) => {
+const CategoryList = ({ cid, style = {}, onPress, image, title, fontSize = 12, item, selectedCategory }) => {
   const selected = isCategorySelected(selectedCategory, item);
+  const linkInteraction = Platform.OS === "web" ? { onClick: onPress } : { onPress };
+
   return (
-    <TouchableOpacity onPress={onPress}>
-      <Link
-        to={`/category/${cid}`}
-        style={{ textDecoration: "none", flex: 1 }}
-      >
-        <View
-          onMouseEnter={() => {}}
-          style={[
-            styles.container,
-            {
-              ...style,
-              flex: 1,
-              backgroundColor: selected ? DarkAccent : "white",
-            },
-          ]}
-        >
-          <Image
-            source={{ uri: image }}
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              width: "100%",
-              height: style.height / 2,
-              resizeMode: "contain",
-              borderRadius: "50%",
-            }}
-          />
-          <Text
-            style={[
-              styles.text,
-              {
-                fontSize,
-                color: selected ? "white" : LittleDarkAccent,
-              },
-            ]}
-          >
-            {title}
-          </Text>
-        </View>
-      </Link>
-    </TouchableOpacity>
+    <Link
+      accessibilityRole="link"
+      accessibilityLabel={`Pilih kategori ${title}`}
+      accessibilityState={{ selected }}
+      {...linkInteraction}
+      style={{ ...styles.link, width: style.width || 96 }}
+      to={`/category/${cid}`}
+    >
+      <View style={[styles.container, { backgroundColor: selected ? DarkAccent : SurfaceColor }]}>
+        <Image source={{ uri: image }} style={[styles.image, { height: style.height || 96 }]} />
+        <Text numberOfLines={2} style={[styles.text, { color: selected ? SurfaceColor : LittleDarkAccent, fontSize }]}>
+          {title}
+        </Text>
+      </View>
+    </Link>
   );
 };
 
 export const isCategorySelected = (selectedCategory, item) =>
-  selectedCategory?.cid != null &&
-  item?.cid != null &&
-  selectedCategory.cid === item.cid;
+  selectedCategory?.cid != null && item?.cid != null && selectedCategory.cid === item.cid;
 
 export default CategoryList;
 
 const styles = StyleSheet.create({
+  link: {
+    marginHorizontal: 6,
+    marginBottom: 12,
+    textDecorationLine: "none",
+  },
   container: {
-    flex: 1,
-    overflow: "hidden",
-    marginHorizontal: _adjustSizes(20),
-    marginBottom: _adjustSizes(40),
-    padding: 10,
-    borderTopLeftRadius: "50%",
-    borderTopRightRadius: "50%",
-    borderBottomLeftRadius: "10%",
-    borderBottomRightRadius: "10%",
-    justifyContent: "center",
     alignItems: "center",
-    boxShadow: "2px 2px 5px rgb(0,0,0,0.5)",
+    borderColor: BorderColor,
+    borderRadius: 16,
+    borderWidth: 1,
+    elevation: 2,
+    overflow: "hidden",
+    paddingBottom: 11,
+    boxShadow: shadow(2),
+  },
+  image: {
+    width: "100%",
+    resizeMode: "cover",
+    backgroundColor: "#e8eee9",
   },
   text: {
-    fontWeight: "600",
+    fontWeight: "800",
+    letterSpacing: 0.3,
+    marginTop: 9,
+    paddingHorizontal: 5,
+    textAlign: "center",
   },
 });

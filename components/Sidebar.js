@@ -1,81 +1,32 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Linking,
-  Platform,
-  Dimensions,
-  Alert,
-} from "react-native";
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { AccentColor2, AccentColor } from "../constant/ColorsConst";
-import { isMobile } from "../constant/isMobile";
+import { AccentColor2, BorderColor, MutedTextColor, SurfaceColor } from "../constant/ColorsConst";
 
-const SideBar = ({style, size, cartHandler, badgeData}) => {
+const SideBar = ({ style, size = 22 }) => {
   const FB_LINK = "https://web.facebook.com/bajubayiluwuk/shop/";
   const WA_LINK =
     "https://wa.me/+6285343638747?text=Kak+Kiki+saya+mau+ecer+baju+nih..";
-  // const onPress = (url) => {
-  //     Linking.openURL(link)
-  // };
-  const alertBox = (x) => {
-    alert(`Hello you clicked ${x} Sidebar Menu`)
-  };
+  const socials = [
+    { label: "Facebook", icon: "logo-facebook", link: FB_LINK },
+    { label: "Instagram", icon: "logo-instagram", link: "https://www.instagram.com/bajubayiluwuk" },
+    { label: "WhatsApp", icon: "logo-whatsapp", link: WA_LINK },
+  ];
 
   return (
     <View style={[styles.sidebar, style]}>
-      {/* <TouchableOpacity onPress={() => Linking.openURL(FB_LINK)}> */}
-      <TouchableOpacity onPress={() => alertBox('Facebook')}>
-        <Ionicons
-          style={{ marginVertical: isMobile ? null : 5 }}
-          name="logo-facebook"
-          size={size}
-          color={AccentColor2}
-        />
-      </TouchableOpacity>
-      {/* <TouchableOpacity onPress={() => Linking.openURL(FB_LINK)}> */}
-      <TouchableOpacity onPress={() => alertBox('Instagram')}>
-        <Ionicons
-          style={{ marginVertical: isMobile ? null : 5 }}
-          name="logo-instagram"
-          size={size}
-          color={AccentColor2}
-        />
-      </TouchableOpacity>
-      {/* <TouchableOpacity onPress={() => Linking.openURL(WA_LINK)}> */}
-      <TouchableOpacity onPress={() => alertBox('Whatsapp')}>
-        <Ionicons
-          style={{ marginVertical: isMobile ? null : 5 }}
-          name="logo-whatsapp"
-          size={size}
-          color={AccentColor2}
-        />
-      </TouchableOpacity>
-      {/* <TouchableOpacity onPress={cartHandler}>
-        <Ionicons
-          style={{ marginVertical: isMobile ? null : 5, }}
-          name="md-cart"
-          size={size}
-          color={AccentColor2}
-        />
-        {badgeData > 0 && (
-          <Text
-            style={{
-              position: "absolute",
-              right: 0,
-              backgroundColor: AccentColor,
-              paddingHorizontal: 5,
-              borderRadius: 20,
-              color: "white",
-              fontSize: isMobile ? 12 : 15,
-            }}
-          >
-            {badgeData}
-          </Text>
-        )}
-      </TouchableOpacity> */}
+      <Text style={styles.label}>Ikuti kami</Text>
+      {socials.map((social) => (
+        <TouchableOpacity
+          key={social.label}
+          accessibilityRole="link"
+          accessibilityLabel={`Buka ${social.label}`}
+          onPress={() => Linking.openURL(social.link)}
+          style={styles.socialButton}
+        >
+          <Ionicons name={social.icon} size={size} color={AccentColor2} />
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };
@@ -84,11 +35,25 @@ export default SideBar;
 
 const styles = StyleSheet.create({
   sidebar: {
-    borderRadius: 20,
-    flex: 1,
-    position: "fixed",
-    alignItems: 'center',
-    boxShadow: "2px 2px 10px rgba(0,0,0,0.2)",
-    backgroundColor: "white",
+    alignItems: "center",
+    backgroundColor: SurfaceColor,
+    borderColor: BorderColor,
+    borderRadius: 18,
+    borderWidth: 1,
+    boxShadow: "0px 6px 18px rgba(32,49,45,0.12)",
+    padding: 8,
+  },
+  label: {
+    color: MutedTextColor,
+    fontSize: 10,
+    fontWeight: "800",
+    marginBottom: 4,
+    transform: [{ rotate: "-90deg" }],
+  },
+  socialButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 44,
+    minWidth: 44,
   },
 });

@@ -1,8 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 import {
+  AccentColor,
   DarkAccent
 } from "../constant/ColorsConst";
 import { cartTotal } from "../constant/function";
@@ -26,6 +27,8 @@ const Cart = ({ size, style, onPress }) => {
   return (
     <View style={[styles.container, style]}>
       <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel={`Buka keranjang, ${getCartItemsCount()} item`}
         activeOpacity={0.6}
         onPress={onPress}
         style={{
@@ -35,15 +38,15 @@ const Cart = ({ size, style, onPress }) => {
           justifyContent: "space-evenly",
         }}
       >
-        <View>
-          <Ionicons name="md-cart" size={size} color="gold" />
+        <View style={styles.iconWrap}>
+          <Ionicons name="cart-outline" size={size} color={AccentColor} />
         </View>
         <View>
-          <Text style={{ color: "white", marginBottom: 5 }}>
+          <Text style={styles.itemText}>
             {getCartItemsCount()} item di keranjang
           </Text>
-          <Text style={{ color: "white", fontWeight: "bold" }}>
-            Total: Rp.{getTotalPrice()}
+          <Text style={styles.totalText}>
+            Total Rp {getTotalPrice()}
           </Text>
         </View>
       </TouchableOpacity>
@@ -55,12 +58,29 @@ export default Cart;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 200,
-    borderRadius: 20,
-    flex: 1,
-    position: "fixed",
-    boxShadow: "2px 2px 10px rgba(0,0,0,0.2)",
+    borderRadius: 18,
+    minHeight: 64,
+    position: Platform.OS === "web" ? "fixed" : "absolute",
+    boxShadow: "0px 8px 22px rgba(32,49,45,0.22)",
     backgroundColor: DarkAccent,
     zIndex: 1,
+  },
+  iconWrap: {
+    alignItems: "center",
+    backgroundColor: "rgba(242,184,75,0.14)",
+    borderRadius: 12,
+    height: 42,
+    justifyContent: "center",
+    width: 42,
+  },
+  itemText: {
+    color: "#d7e3dc",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  totalText: {
+    color: "white",
+    fontSize: 15,
+    fontWeight: "800",
   },
 });

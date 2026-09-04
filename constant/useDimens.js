@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {Dimensions} from 'react-native';
+import { Dimensions, Platform } from "react-native";
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -9,18 +9,18 @@ export default () => {
     const _width = _dimensions.window.width;
     const _height = _dimensions.window.height;
   
-    const isWeb = _width > _height;
+    const isWeb = Platform.OS === "web";
   
     const onChangeDimens = ({ window, screen }) => {
       setDimensions({ window, screen });
     };
   
     useEffect(() => {
-      Dimensions.addEventListener("change", onChangeDimens);
+      const subscription = Dimensions.addEventListener("change", onChangeDimens);
       return () => {
-        Dimensions.removeEventListener("change", onChangeDimens);
+        subscription?.remove?.();
       };
-    }, [_width, _height]);
+    }, []);
 
     return [_width, _height, isWeb, _dimensions]
 }

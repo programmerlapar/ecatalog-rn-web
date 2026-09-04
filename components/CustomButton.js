@@ -1,21 +1,13 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { _adjustSizes } from "../constant/adjustedSizes";
-import { AccentColor2 } from "../constant/ColorsConst";
+import { AccentColor2, SurfaceColor } from "../constant/ColorsConst";
 
-const CustomButton = ({onPress, bgcolor, textColor,style, title}) => {
+const CustomButton = ({ onPress, bgcolor = AccentColor2, textColor = SurfaceColor, style, title }) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity accessibilityRole="button" onPress={onPress} style={[styles.touchable, style, { backgroundColor: bgcolor }]}>
       <Text
-        style={[
-          styles.text,
-          styles.touchable,
-          {
-            backgroundColor: bgcolor,
-            color: textColor,
-            ...style,
-          },
-        ]}
+        style={[styles.text, { color: textColor }]}
       >
         {title}
       </Text>
@@ -33,12 +25,11 @@ const styles = StyleSheet.create({
   },
   touchable: {
     alignSelf: "center",
-    width: "100%",
+    minHeight: 44,
+    justifyContent: "center",
     borderRadius: 10,
-    color: "white",
-    paddingHorizontal: _adjustSizes(10),
-    paddingVertical: _adjustSizes(5),
-    marginBottom: _adjustSizes(5),
-    backgroundColor: AccentColor2,
+    paddingHorizontal: _adjustSizes(14),
+    paddingVertical: _adjustSizes(8),
+    marginBottom: _adjustSizes(8),
   },
 });
