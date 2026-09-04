@@ -3,6 +3,7 @@ import React from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 import {
+  AccentColor,
   DarkAccent
 } from "../constant/ColorsConst";
 import { cartTotal } from "../constant/function";
@@ -38,7 +39,7 @@ const Cart = ({ size, style, onPress }) => {
         }}
       >
         <View style={styles.iconWrap}>
-          <Ionicons name="cart-outline" size={size} color="gold" />
+          <Ionicons name="cart-outline" size={size} color={AccentColor} />
         </View>
         <View>
           <Text style={styles.itemText}>

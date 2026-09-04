@@ -2,6 +2,7 @@ import React from "react";
 import {
   Image,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -44,46 +45,48 @@ const ProductsModal = ({ productModal, productModalHandler, product = {}, price 
         <TouchableWithoutFeedback onPress={productModalHandler}>
           <View style={styles.backdrop} />
         </TouchableWithoutFeedback>
-        <View style={styles.dialog}>
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel="Tutup detail hidangan"
-            onPress={productModalHandler}
-            style={styles.closeButton}
-          >
-            <Text style={styles.closeText}>Tutup</Text>
-          </TouchableOpacity>
-          <Image
-            accessibilityLabel={`${product.strMeal} gambar`}
-            source={{ uri: product.strMealThumb }}
-            style={styles.image}
-          />
-          <Text style={styles.title}>{product.strMeal}</Text>
-          <Text style={styles.price}>Rp {price?.toLocaleString("id-ID")}</Text>
-          <Text style={styles.instruction}>Atur jumlah pesanan</Text>
-          <View style={styles.quantityControl}>
+         <View style={styles.dialog}>
+          <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
             <TouchableOpacity
               accessibilityRole="button"
-              accessibilityLabel={`Kurangi ${product.strMeal}`}
-              accessibilityState={{ disabled: quantity === 0 }}
-              disabled={quantity === 0}
-              onPress={() => changeQuantity("-")}
-              style={[styles.quantityButton, quantity === 0 && styles.disabledButton]}
+              accessibilityLabel="Tutup detail hidangan"
+              onPress={productModalHandler}
+              style={styles.closeButton}
             >
-              <Text style={styles.quantityButtonText}>-</Text>
+              <Text style={styles.closeText}>Tutup</Text>
             </TouchableOpacity>
-            <View accessibilityLiveRegion="polite" style={styles.quantityValue}>
-              <Text style={styles.quantityText}>{quantity}</Text>
+            <Image
+              accessibilityLabel={`${product.strMeal} gambar`}
+              source={{ uri: product.strMealThumb }}
+              style={styles.image}
+            />
+            <Text style={styles.title}>{product.strMeal}</Text>
+            <Text style={styles.price}>Rp {price?.toLocaleString("id-ID")}</Text>
+            <Text style={styles.instruction}>Atur jumlah pesanan</Text>
+            <View style={styles.quantityControl}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={`Kurangi ${product.strMeal}`}
+                accessibilityState={{ disabled: quantity === 0 }}
+                disabled={quantity === 0}
+                onPress={() => changeQuantity("-")}
+                style={[styles.quantityButton, quantity === 0 && styles.disabledButton]}
+              >
+                <Text style={styles.quantityButtonText}>-</Text>
+              </TouchableOpacity>
+              <View accessibilityLiveRegion="polite" style={styles.quantityValue}>
+                <Text style={styles.quantityText}>{quantity}</Text>
+              </View>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={`Tambah ${product.strMeal}`}
+                onPress={() => changeQuantity("+")}
+                style={styles.quantityButton}
+              >
+                <Text style={styles.quantityButtonText}>+</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              accessibilityRole="button"
-              accessibilityLabel={`Tambah ${product.strMeal}`}
-              onPress={() => changeQuantity("+")}
-              style={styles.quantityButton}
-            >
-              <Text style={styles.quantityButtonText}>+</Text>
-            </TouchableOpacity>
-          </View>
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -109,11 +112,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: BackgroundColor,
     borderRadius: 24,
+    maxHeight: "90%",
     maxWidth: 420,
-    padding: 22,
     width: "100%",
     elevation: 10,
     boxShadow: "0px 10px 30px rgba(20,35,31,0.24)",
+  },
+  content: {
+    alignItems: "center",
+    padding: 22,
   },
   closeButton: {
     alignSelf: "flex-end",

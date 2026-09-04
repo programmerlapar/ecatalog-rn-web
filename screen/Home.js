@@ -117,7 +117,7 @@ const Home = () => {
 
         <View style={styles.routeContent}>
           <Route exact path="/" component={Dashboard} />
-          <Route path="/category/:id" component={Dashboard} />
+          <Route path="/category/:id" render={({ match }) => <Dashboard categoryId={match.params.id} />} />
           <Route path="/about" component={About} />
           <Route path="/product/:id" component={({ match }) => <Product rem={rem} match={match} />} />
         </View>

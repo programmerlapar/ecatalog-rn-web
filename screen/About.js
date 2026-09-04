@@ -5,6 +5,7 @@ import {
   BackgroundColor,
   DarkAccent,
   LittleDarkAccent,
+  MutedSurfaceColor,
   MutedTextColor,
   SurfaceColor,
 } from "../constant/ColorsConst";
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   note: {
-    backgroundColor: "#f1f3ee",
+    backgroundColor: MutedSurfaceColor,
     borderRadius: 14,
     marginTop: 24,
     paddingHorizontal: 18,

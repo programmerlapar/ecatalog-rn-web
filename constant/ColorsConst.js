@@ -1,6 +1,6 @@
 export const PrimaryColor = "#2f756d";
 export const AccentColor = "#f2b84b";
-export const AccentColor2 = "#d95d39";
+export const AccentColor2 = "#b9482f";
 export const DarkAccent = "#20312d";
 export const LittleDarkAccent = "#52615d";
 export const BackgroundColor = "#fbfaf6";

@@ -88,7 +88,7 @@ const ProductList = ({ style = {}, fontSize = 14, title, image, imagePath, price
           )}
           {canViewDetails && (
             <Link
-              accessibilityRole="button"
+              accessibilityRole="link"
               accessibilityLabel={`Lihat detail ${title}`}
               style={styles.secondaryAction}
               to={`/product/${item.idMeal}`}

@@ -9,7 +9,7 @@ const CategoryList = ({ cid, style = {}, onPress, image, title, fontSize = 12, i
 
   return (
     <Link
-      accessibilityRole="button"
+      accessibilityRole="link"
       accessibilityLabel={`Pilih kategori ${title}`}
       accessibilityState={{ selected }}
       {...linkInteraction}

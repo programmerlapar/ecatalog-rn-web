@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../components/Loading";
@@ -20,13 +20,33 @@ const Product = ({ match, rem }) => {
   const [_width, , isWeb] = useDimens();
   const dispatch = useDispatch();
   const id = match.params.id;
+  const [error, setError] = useState(false);
+  const [requesting, setRequesting] = useState(true);
 
   useEffect(() => {
+    setError(false);
+    setRequesting(true);
     dispatch(isLoadingHandler(true));
-    dispatch(fetchDetailMenu(id));
+    dispatch(fetchDetailMenu(id))
+      .catch(() => setError(true))
+      .finally(() => setRequesting(false));
   }, [dispatch, id]);
 
-  if (loading || !menuDetails?.strMeal) {
+  const detailReady = menuDetails?.strMeal && String(menuDetails.idMeal) === String(id);
+
+  if (error || (!requesting && !detailReady)) {
+    return (
+      <View style={styles.errorState}>
+        <Text style={styles.errorTitle}>Hidangan tidak bisa dimuat</Text>
+        <Text style={styles.errorText}>Coba kembali ke menu dan pilih hidangan lain.</Text>
+        <Link accessibilityRole="link" to="/" style={styles.backButton}>
+          <Text style={styles.backButtonText}>Kembali ke menu</Text>
+        </Link>
+      </View>
+    );
+  }
+
+  if (requesting || loading || !detailReady) {
     return <Loading />;
   }
 
@@ -41,9 +61,9 @@ const Product = ({ match, rem }) => {
           <Image
             accessibilityLabel={`${menuDetails.strMeal} gambar`}
             source={{ uri: menuDetails.strMealThumb }}
-            style={[styles.image, { width: isWeb ? Math.min(_width * 0.42, 430) : _width - 48, height: isWeb ? 430 : _width - 48 }]}
+            style={[styles.image, { width: isWeb ? Math.min(_width * 0.42, 430) : "100%", height: isWeb ? Math.min(_width * 0.42, 430) : undefined }]}
           />
-          <View style={styles.details}>
+          <View style={[styles.details, !isWeb && styles.mobileDetails]}>
             <Text style={[styles.title, { fontSize: isWeb ? 31 : rem(12) }]}>{menuDetails.strMeal}</Text>
             <Text style={styles.label}>Tentang hidangan</Text>
             <Text style={styles.description}>{menuDetails.strInstructions}</Text>
@@ -96,6 +116,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   image: {
+    aspectRatio: 1,
     backgroundColor: "#e8eee9",
     borderRadius: 18,
     resizeMode: "cover",
@@ -122,5 +143,42 @@ const styles = StyleSheet.create({
     color: LittleDarkAccent,
     fontSize: 15,
     lineHeight: 24,
+  },
+  mobileDetails: {
+    width: "100%",
+  },
+  errorState: {
+    alignItems: "center",
+    backgroundColor: BackgroundColor,
+    flex: 1,
+    justifyContent: "center",
+    padding: 24,
+  },
+  errorTitle: {
+    color: DarkAccent,
+    fontSize: 18,
+    fontWeight: "800",
+    textAlign: "center",
+  },
+  errorText: {
+    color: LittleDarkAccent,
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: "center",
+  },
+  backButton: {
+    alignItems: "center",
+    backgroundColor: AccentColor,
+    borderRadius: 10,
+    justifyContent: "center",
+    marginTop: 18,
+    minHeight: 44,
+    paddingHorizontal: 18,
+    textDecorationLine: "none",
+  },
+  backButtonText: {
+    color: DarkAccent,
+    fontSize: 13,
+    fontWeight: "800",
   },
 });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BottomSheet from "../components/BottomSheet";
 import Cart from "../components/Cart";
@@ -13,12 +13,13 @@ import {
   DarkAccent,
   LittleDarkAccent,
   MutedTextColor,
+  MutedSurfaceColor,
   PrimaryColor,
 } from "../constant/ColorsConst";
 import priceInt, { cartTotal } from "../constant/function";
 import useDimens from "../constant/useDimens";
 import data from "../data/data.json";
-import { fetchAllMenu, fetchCategory, fetchMenu } from "../store/actions/menu";
+import { fetchAllMenu, fetchCategory, fetchLatestMenu } from "../store/actions/menu";
 
 const promoImages = {
   "paket_1.jpg": require("../assets/paket_1.jpg"),
@@ -26,7 +27,7 @@ const promoImages = {
   "paket_3.jpeg": require("../assets/paket_3.jpeg"),
 };
 
-const Dashboard = () => {
+const Dashboard = ({ categoryId }) => {
   const availCat = useSelector((state) => state.menu.categoryList);
   const availLatestMenu = useSelector((state) => state.menu.latestMenu);
   const availMenu = useSelector((state) => state.menu.availableMenu);
@@ -40,12 +41,29 @@ const Dashboard = () => {
   const [meals, setMeals] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [menuLoading, setMenuLoading] = useState(true);
+  const [menuError, setMenuError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const dispatch = useDispatch();
+  const rawCategories = availCat?.categories || [];
 
   useEffect(() => {
-    dispatch(fetchCategory());
-    dispatch(fetchMenu("starter"));
-  }, [dispatch]);
+    dispatch(fetchCategory()).catch(() => {
+      if (categoryId) {
+        setMenuError(true);
+        setMenuLoading(false);
+      }
+    });
+    if (!categoryId) {
+      setSelectedCategory(null);
+      setMeals(false);
+      setMenuLoading(true);
+      setMenuError(false);
+      dispatch(fetchLatestMenu())
+        .catch(() => setMenuError(true))
+        .finally(() => setMenuLoading(false));
+    }
+  }, [categoryId, dispatch, retryCount]);
 
   const categories = (availCat.categories || []).map((category) => ({
     ...category,
@@ -54,13 +72,42 @@ const Dashboard = () => {
     image_link: category.image_link ?? category.strCategoryThumb,
   }));
   const menu = meals ? availLatestMenu?.meals || [] : availMenu?.meals || [];
-  const cardWidth = isWeb ? Math.min(250, Math.max(170, (_width - 112) / 4)) : Math.max(138, (_width - 52) / 2);
+  const columns = isWeb && _width >= 720 ? 4 : 2;
+  const contentWidth = Math.min(_width, 1120) - (isWeb ? 64 : 32);
+  const cardWidth = Math.max(0, Math.floor((contentWidth - columns * 16) / columns));
   const cardHeight = isWeb ? 292 : 238;
+
+  useEffect(() => {
+    if (!categoryId || !rawCategories.length) {
+      return;
+    }
+
+    const category = rawCategories.find((item) =>
+      String(item.cid || item.idCategory || item.id) === String(categoryId)
+    );
+    if (!category) {
+      setMenuError(true);
+      setMenuLoading(false);
+      return;
+    }
+
+    setSelectedCategory({
+      ...category,
+      cid: category.cid || category.idCategory || category.id,
+      title: category.title ?? category.strCategory,
+      image_link: category.image_link ?? category.strCategoryThumb,
+    });
+    setMeals(true);
+    setMenuLoading(true);
+    setMenuError(false);
+    dispatch(fetchAllMenu((category.title ?? category.strCategory).toLowerCase()))
+      .catch(() => setMenuError(true))
+      .finally(() => setMenuLoading(false));
+  }, [categoryId, dispatch, rawCategories, retryCount]);
 
   const selectCategory = (category) => {
     setSelectedCategory(category);
     setMeals(true);
-    dispatch(fetchAllMenu(category.title.toLowerCase()));
   };
 
   const selectProduct = (product) => {
@@ -68,7 +115,7 @@ const Dashboard = () => {
     setProductModal(true);
   };
 
-  if (loading && !menu.length && !categories.length) {
+  if (menuLoading || (loading && !menu.length && !categories.length)) {
     return <Loading />;
   }
 
@@ -135,11 +182,19 @@ const Dashboard = () => {
           {meals && <Text style={styles.menuCount}>{menu.length} pilihan</Text>}
         </View>
 
-        {menu.length ? (
+        {menuError ? (
+          <View style={styles.errorState}>
+            <Text style={styles.emptyTitle}>Menu belum bisa dimuat</Text>
+            <Text style={styles.emptyText}>Periksa koneksi internetmu, lalu coba lagi.</Text>
+            <TouchableOpacity accessibilityRole="button" onPress={() => setRetryCount((count) => count + 1)} style={styles.retryButton}>
+              <Text style={styles.retryText}>Coba lagi</Text>
+            </TouchableOpacity>
+          </View>
+        ) : menu.length ? (
           <FlatList
             data={menu}
             keyExtractor={(item) => item.idMeal}
-            numColumns={isWeb ? 4 : 2}
+            numColumns={columns}
             scrollEnabled={false}
             columnWrapperStyle={isWeb ? styles.column : undefined}
             contentContainerStyle={styles.productGrid}
@@ -300,7 +355,7 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: "center",
-    backgroundColor: "#f1f3ee",
+    backgroundColor: MutedSurfaceColor,
     borderRadius: 16,
     marginTop: 4,
     paddingHorizontal: 22,
@@ -318,6 +373,27 @@ const styles = StyleSheet.create({
     marginTop: 6,
     maxWidth: 360,
     textAlign: "center",
+  },
+  errorState: {
+    alignItems: "center",
+    backgroundColor: MutedSurfaceColor,
+    borderRadius: 16,
+    marginTop: 4,
+    paddingHorizontal: 22,
+    paddingVertical: 30,
+  },
+  retryButton: {
+    backgroundColor: AccentColor,
+    borderRadius: 10,
+    marginTop: 16,
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: 18,
+  },
+  retryText: {
+    color: DarkAccent,
+    fontSize: 13,
+    fontWeight: "800",
   },
   cart: {
     backgroundColor: DarkAccent,
