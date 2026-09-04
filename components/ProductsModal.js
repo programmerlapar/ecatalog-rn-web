@@ -1,195 +1,190 @@
 import React from "react";
 import {
+  Image,
+  Modal,
   StyleSheet,
   Text,
-  Image,
-  View,
-  Modal,
-  TouchableWithoutFeedback,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { editOrder } from "../store/actions/cart";
-import { LittleDarkAccent } from "../constant/ColorsConst";
+import {
+  AccentColor,
+  AccentColor2,
+  BackgroundColor,
+  DarkAccent,
+  LittleDarkAccent,
+  MutedTextColor,
+  SurfaceColor,
+} from "../constant/ColorsConst";
 
-const BUTTON_SIZES = 50;
-
-const ProductsModal = ({
-  productModal,
-  productModalHandler,
-  props,
-  cart,
-  product,
-  price,
-}) => {
-  //   const [orderItems, setOrderItems] = React.useState([]);
+const ProductsModal = ({ productModal, productModalHandler, product = {}, price }) => {
   const order = useSelector((state) => state.cart.orderItems);
-
   const dispatch = useDispatch();
+  const quantity = order.find((item) => item.idMeal === product.idMeal)?.qty || 0;
 
-  //   let orderList = orderItems.slice();
-  //   let item = orderList.filter((i) => i.idMeal == product.idMeal);
+  if (!product.idMeal) {
+    return null;
+  }
 
-  //   const editOrder = (action) => {
-  //     if (action == "+") {
-  //       if (item.length > 0) {
-  //         let newQty = item[0].qty + 1;
-  //         item[0].qty = newQty;
-  //         item[0].total = item[0].qty * price;
-  //       } else {
-  //         const newItem = {
-  //           idMeal: product.idMeal,
-  //           qty: 1,
-  //           price: price,
-  //           total: price,
-  //         };
-  //         orderList.push(newItem);
-  //       }
-
-  //       setOrderItems(orderList);
-  //     } else {
-  //       if (item.length > 0) {
-  //         if (item[0]?.qty > 1) {
-  //           let newQty = item[0].qty - 1;
-  //           item[0].qty = newQty;
-  //           item[0].total = newQty * price;
-  //         } else {
-  //           orderList.pop();
-  //         }
-  //       }
-
-  //       setOrderItems(orderList);
-  //     }
-  //   };
-  const getOrderQty = () => {
-    let orderList = order.slice();
-    let item = orderList.filter((a) => a.idMeal == product.idMeal);
-
-    if (item.length > 0) {
-      return item[0].qty;
-    }
-
-    return 0;
+  const changeQuantity = (action) => {
+    dispatch(editOrder(action, product.idMeal, price, product.strMeal, product.strMealThumb));
   };
 
   return (
     <Modal
-      underlayColor="red"
       animationType="fade"
-      visible={productModal}
       onRequestClose={productModalHandler}
-      transparent={true}
-      {...props}
+      transparent
+      visible={productModal}
     >
-      <TouchableWithoutFeedback onPress={productModalHandler}>
-        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.7)" }}>
-          <View
-            style={{
-              // flex: 1,
-              alignItems: "center",
-              backgroundColor: "white",
-              borderColor: "#eee",
-              borderRadius: 10,
-              borderWidth: 1,
-              justifyContent: "center",
-              marginTop: 100,
-              //   height,
-              margin: "auto",
-              padding: 30,
-              //   width,
-            }}
+      <View style={styles.overlay}>
+        <TouchableWithoutFeedback onPress={productModalHandler}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
+        <View style={styles.dialog}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Tutup detail hidangan"
+            onPress={productModalHandler}
+            style={styles.closeButton}
           >
-            <Image
-              source={{ uri: product.strMealThumb }}
-              style={styles.image}
-            />
-            <Text style={styles.title}>{product.strMeal}</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                // disabled={() => disabledButton(product.idMeal, true, false)}
-                onPress={() =>
-                  dispatch(
-                    editOrder(
-                      "-",
-                      product.idMeal,
-                      price,
-                      product.strMeal,
-                      product.strMealThumb
-                    )
-                  )
-                }
-                style={[
-                  styles.buttonText,
-                  {
-                    borderTopLeftRadius: 25,
-                    borderBottomLeftRadius: 25,
-                  },
-                ]}
-              >
-                <Text style={styles.buttonTitle}>-</Text>
-              </TouchableOpacity>
-              <View style={styles.buttonText}>
-                <Text style={styles.buttonTitle}>{getOrderQty(product)}</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() =>
-                  dispatch(
-                    editOrder(
-                      "+",
-                      product.idMeal,
-                      price,
-                      product.strMeal,
-                      product.strMealThumb
-                    )
-                  )
-                }
-                style={[
-                  styles.buttonText,
-                  {
-                    borderTopRightRadius: 25,
-                    borderBottomRightRadius: 25,
-                  },
-                ]}
-              >
-                <Text style={styles.buttonTitle}>+</Text>
-              </TouchableOpacity>
+            <Text style={styles.closeText}>Tutup</Text>
+          </TouchableOpacity>
+          <Image
+            accessibilityLabel={`${product.strMeal} gambar`}
+            source={{ uri: product.strMealThumb }}
+            style={styles.image}
+          />
+          <Text style={styles.title}>{product.strMeal}</Text>
+          <Text style={styles.price}>Rp {price?.toLocaleString("id-ID")}</Text>
+          <Text style={styles.instruction}>Atur jumlah pesanan</Text>
+          <View style={styles.quantityControl}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`Kurangi ${product.strMeal}`}
+              accessibilityState={{ disabled: quantity === 0 }}
+              disabled={quantity === 0}
+              onPress={() => changeQuantity("-")}
+              style={[styles.quantityButton, quantity === 0 && styles.disabledButton]}
+            >
+              <Text style={styles.quantityButtonText}>-</Text>
+            </TouchableOpacity>
+            <View accessibilityLiveRegion="polite" style={styles.quantityValue}>
+              <Text style={styles.quantityText}>{quantity}</Text>
             </View>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`Tambah ${product.strMeal}`}
+              onPress={() => changeQuantity("+")}
+              style={styles.quantityButton}
+            >
+              <Text style={styles.quantityButtonText}>+</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     </Modal>
   );
 };
 
-export default ProductsModal;
-
 const styles = StyleSheet.create({
+  overlay: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+  },
+  backdrop: {
+    backgroundColor: "rgba(20,35,31,0.62)",
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
+  dialog: {
+    alignItems: "center",
+    backgroundColor: BackgroundColor,
+    borderRadius: 24,
+    maxWidth: 420,
+    padding: 22,
+    width: "100%",
+    elevation: 10,
+    boxShadow: "0px 10px 30px rgba(20,35,31,0.24)",
+  },
+  closeButton: {
+    alignSelf: "flex-end",
+    minHeight: 40,
+    justifyContent: "center",
+    paddingHorizontal: 8,
+  },
+  closeText: {
+    color: MutedTextColor,
+    fontSize: 13,
+    fontWeight: "800",
+  },
   image: {
-    width: 200,
-    height: 200,
+    backgroundColor: "#e8eee9",
+    borderRadius: 16,
+    height: 220,
+    marginBottom: 16,
+    width: 220,
   },
   title: {
-    fontSize: 14,
-    fontWeight: "bold",
-    marginVertical: 10,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    alignContent: "center",
-  },
-  buttonText: {
-    width: BUTTON_SIZES,
-    height: BUTTON_SIZES,
-    backgroundColor: "tomato",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonTitle: {
+    color: DarkAccent,
     fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: "800",
+    textAlign: "center",
+  },
+  price: {
+    color: AccentColor2,
+    fontSize: 16,
+    fontWeight: "800",
+    marginTop: 6,
+  },
+  instruction: {
+    color: LittleDarkAccent,
+    fontSize: 13,
+    marginTop: 20,
+  },
+  quantityControl: {
+    alignItems: "center",
+    flexDirection: "row",
+    marginTop: 9,
+  },
+  quantityButton: {
+    alignItems: "center",
+    backgroundColor: AccentColor2,
+    borderRadius: 12,
+    height: 48,
+    justifyContent: "center",
+    width: 52,
+  },
+  disabledButton: {
+    backgroundColor: "#c8cfca",
+  },
+  quantityValue: {
+    alignItems: "center",
+    backgroundColor: SurfaceColor,
+    borderColor: "#d9e0da",
+    borderWidth: 1,
+    height: 48,
+    justifyContent: "center",
+    width: 64,
+  },
+  quantityText: {
+    color: DarkAccent,
+    fontSize: 18,
+    fontWeight: "800",
+  },
+  quantityButtonText: {
+    color: SurfaceColor,
+    fontSize: 23,
+    fontWeight: "700",
   },
 });
+
+export default ProductsModal;

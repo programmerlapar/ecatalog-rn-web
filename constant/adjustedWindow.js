@@ -11,21 +11,19 @@ const _dimens = () => {
   };
 
   useEffect(() => {
-    Dimensions.addEventListener("change", onChangeDimens);
+    const subscription = Dimensions.addEventListener("change", onChangeDimens);
     return () => {
-      Dimensions.removeEventListener("change", onChangeDimens);
+      subscription?.remove?.();
     };
-  });
+  }, []);
 
   return _dimensions;
 };
 
 const _rem = (size) => {
-  if (_dimens().window.height > _dimens().window.height) {
-    return (size * _dimens().window.width) / 380;
-  } else {
-    return (size * _dimens().window.height) / 380;
-  }
+  const dimensions = _dimens();
+  const base = Math.min(dimensions.window.width, dimensions.window.height);
+  return (size * base) / 380;
 };
 
 export default _rem;

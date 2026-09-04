@@ -1,161 +1,126 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import Fade from "react-reveal/Fade";
 import Loading from "../components/Loading";
-import { AccentColor, LittleDarkAccent, shadow } from "../constant/ColorsConst";
-import { HEADER_MARGIN } from "../constant/isMobile";
-import useDimens from "../constant/useDimens";
+import {
+  AccentColor,
+  BackgroundColor,
+  DarkAccent,
+  LittleDarkAccent,
+  SurfaceColor,
+} from "../constant/ColorsConst";
 import { Link } from "../navigation";
 import { fetchDetailMenu, isLoadingHandler } from "../store/actions/menu";
+import useDimens from "../constant/useDimens";
 
 const Product = ({ match, rem }) => {
   const menuDetails = useSelector((state) => state.menu.detailMenu);
-  const [_width, _height, isWeb] = useDimens();
-  const isLoadingStat = useSelector((state) => state.menu.isFetching);
-  const id = match.params.id;
+  const loading = useSelector((state) => state.menu.isFetching);
+  const [_width, , isWeb] = useDimens();
   const dispatch = useDispatch();
+  const id = match.params.id;
 
-  useEffect(async () => {
-    await dispatch(isLoadingHandler())
-    await dispatch(fetchDetailMenu(id));
-  }, []);
+  useEffect(() => {
+    dispatch(isLoadingHandler(true));
+    dispatch(fetchDetailMenu(id));
+  }, [dispatch, id]);
+
+  if (loading || !menuDetails?.strMeal) {
+    return <Loading />;
+  }
 
   return (
-    <View>
-      {!isLoadingStat ? (
-        <Fade bottom>
-          <View style={[styles.container]}>
-            <Link
-              to="/"
-              style={{
-                marginLeft: HEADER_MARGIN,
-                textDecoration: "none",
-                marginTop: HEADER_MARGIN / 4,
-                marginBottom: 10,
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: AccentColor,
-                  width: isWeb ? _width * 0.06 : _width * 0.18,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: shadow(2, 0.2),
-                  borderRadius: 10,
-                  paddingVertical: 5,
-                }}
-              >
-                <Ionicons
-                  name="ios-arrow-round-back"
-                  size={15}
-                  color="white"
-                  style={{ marginRight: 5 }}
-                />
-                <Text style={{ color: "white" }}>Kembali</Text>
-              </View>
-            </Link>
-            <View style={[styles.box]}>
-              <View
-                style={[
-                  styles.imageContainer,
-                  {
-                    width: _height / 2,
-                    height: _height / 2,
-                  },
-                ]}
-              >
-                <Image
-                  source={{ uri: menuDetails.strMealThumb }}
-                  style={styles.image}
-                />
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  paddingHorizontal: HEADER_MARGIN,
-                  alignItems: isWeb ? "flex-start" : "center",
-                  justifyContent: "center",
-                  width: isWeb ? "50%" : "80%",
-                }}
-              >
-                <Text
-                  style={[
-                    styles.title,
-                    {
-                      marginTop: isWeb ? null : 10,
-                      textAlign: isWeb ? "left" : "center",
-                      fontSize: rem(12),
-                    },
-                  ]}
-                >
-                  {menuDetails.strMeal}
-                </Text>
-                <View
-                  style={{
-                    height: isWeb ? "50%" : null,
-                    width: isWeb ? null : "100%",
-                  }}
-                >
-                  <Text style={{ color: "gray" }}>Description:</Text>
-                  <View
-                    style={{
-                      flex: 1,
-                      marginVertical: 5,
-                      paddingVertical: 5,
-                      paddingHorizontal: 10,
-                      boxShadow: shadow(5, 0.2),
-                      borderRadius: 10,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: isWeb ? 14 : rem(7),
-                        textAlign: "justify",
-                      }}
-                    >
-                      {menuDetails.strInstructions}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
+    <ScrollView contentContainerStyle={styles.page}>
+      <View style={styles.content}>
+        <Link accessibilityRole="link" style={styles.backLink} to="/">
+          <Ionicons name="arrow-back" size={17} color={DarkAccent} />
+          <Text style={styles.backText}>Kembali ke menu</Text>
+        </Link>
+        <View style={[styles.box, isWeb ? styles.webBox : styles.mobileBox]}>
+          <Image
+            accessibilityLabel={`${menuDetails.strMeal} gambar`}
+            source={{ uri: menuDetails.strMealThumb }}
+            style={[styles.image, { width: isWeb ? Math.min(_width * 0.42, 430) : _width - 48, height: isWeb ? 430 : _width - 48 }]}
+          />
+          <View style={styles.details}>
+            <Text style={[styles.title, { fontSize: isWeb ? 31 : rem(12) }]}>{menuDetails.strMeal}</Text>
+            <Text style={styles.label}>Tentang hidangan</Text>
+            <Text style={styles.description}>{menuDetails.strInstructions}</Text>
           </View>
-        </Fade>
-      ) : (
-        <Loading />
-      )}
-    </View>
+        </View>
+      </View>
+    </ScrollView>
   );
 };
 
 export default Product;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: HEADER_MARGIN + 40 },
-  box: {
-    flexDirection: "row",
-    flex: 1,
-    flexWrap: "wrap",
-    justifyContent: "space-evenly",
-    alignItems: "flex-start",
+  page: {
+    backgroundColor: BackgroundColor,
+    flexGrow: 1,
+    padding: 24,
   },
-  imageContainer: {
-    backgroundColor: "white",
-    marginHorizontal: HEADER_MARGIN,
-    boxShadow: shadow(6, 0.2),
-    overflow: "hidden",
-    borderRadius: 10,
+  content: {
+    alignSelf: "center",
+    maxWidth: 1120,
+    width: "100%",
+  },
+  backLink: {
+    alignItems: "center",
+    flexDirection: "row",
+    marginBottom: 22,
+    minHeight: 44,
+    textDecorationLine: "none",
+  },
+  backText: {
+    color: DarkAccent,
+    fontSize: 14,
+    fontWeight: "800",
+    marginLeft: 8,
+  },
+  box: {
+    alignItems: "center",
+    backgroundColor: SurfaceColor,
+    borderRadius: 24,
+    padding: 18,
+    elevation: 4,
+    boxShadow: "0px 8px 24px rgba(32,49,45,0.1)",
+  },
+  webBox: {
+    flexDirection: "row",
+    gap: 30,
+  },
+  mobileBox: {
+    padding: 12,
   },
   image: {
+    backgroundColor: "#e8eee9",
+    borderRadius: 18,
     resizeMode: "cover",
-    width: "100%",
-    height: "100%",
+  },
+  details: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 18,
   },
   title: {
-    fontWeight: "bold",
+    color: DarkAccent,
+    fontWeight: "800",
+    lineHeight: 38,
+  },
+  label: {
+    color: AccentColor,
+    fontSize: 13,
+    fontWeight: "800",
+    marginBottom: 8,
+    marginTop: 25,
+    textTransform: "uppercase",
+  },
+  description: {
     color: LittleDarkAccent,
+    fontSize: 15,
+    lineHeight: 24,
   },
 });

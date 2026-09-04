@@ -1,253 +1,200 @@
-import React, { useCallback } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
 import {
-  Animated,
-  Dimensions,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  Easing,
   View,
 } from "react-native";
+import { cartTotal } from "../constant/function";
 import {
+  AccentColor,
   AccentColor2,
+  BorderColor,
   DarkAccent,
   LittleDarkAccent,
+  MutedTextColor,
+  SurfaceColor,
+  shadow,
 } from "../constant/ColorsConst";
-import { isMobile } from "../constant/isMobile";
 import { Link } from "../navigation";
-import Slide from "react-reveal/Slide";
-import Fade from "react-reveal/Fade";
 
-const { width, height } = Dimensions.get("window");
-const ProductList = ({
-  style,
-  fontSize,
-  title,
-  image,
-  imagePath,
-  price,
-  onPress,
-  id,
-  onClick,
-  item,
-}) => {
-  const [pressed, setPressed] = React.useState(false);
+const ProductList = ({ style = {}, fontSize = 14, title, image, imagePath, price, onPress, item }) => {
+  const [expanded, setExpanded] = React.useState(false);
+  const canOrder = typeof onPress === "function";
+  const canViewDetails = Boolean(item?.idMeal);
+  const cardHeight = style.height || 240;
+  const imageHeight = Math.max(110, cardHeight * 0.58);
 
-  const SlideInView = useCallback(({ children, style }) => {
-    const slideAnim = React.useRef(new Animated.Value(40)).current;
-    Animated.spring(slideAnim, {
-      toValue: 0,
-      // tension: 2,
-      duration: 5000,
-      useNativeDriver: true,
-      easing: Easing.back,
-    }).start();
-
-    return (
-      <Animated.View
-        style={{
-          ...style,
-          bottom: slideAnim,
-          zIndex: -1,
-          paddingBottom: 10,
-        }}
-      >
-        {children}
-      </Animated.View>
-    );
-  }, [pressed]);
-
-  const SmallAnimView = ({ children }) => {
-    const DEFAULT = style.height;
-    const SMALLER = style.height * 0.96;
-    const smallAnim = React.useRef(new Animated.Value(DEFAULT)).current;
-    const smallAnimOut = React.useRef(new Animated.Value(SMALLER)).current;
-
-    Animated.spring(smallAnim, {
-      toValue: SMALLER,
-      // tension: 2,
-      duration: 5000,
-      useNativeDriver: true,
-      easing: Easing.back,
-    }).start();
-
-    Animated.spring(smallAnimOut, {
-      toValue: DEFAULT,
-      // tension: 2,
-      duration: 5000,
-      useNativeDriver: true,
-      easing: Easing.back,
-    }).start();
-
-    return (
-      <Animated.View
-      // style={{ height: pressed ? smallAnim : smallAnimOut }}
-      >
-        {children}
-      </Animated.View>
-    );
+  const toggleDetails = () => {
+    if (canOrder || canViewDetails) {
+      setExpanded((current) => !current);
+    }
   };
 
   return (
-    <TouchableOpacity onPress={() => setPressed(!pressed)}>
-      <SmallAnimView>
-        <View
-          style={[
-            style,
-            {
-              flexGrow: 0,
-              flexShrink: 1,
-              marginHorizontal: 10,
-              boxShadow: "0px 0px 5px rgba(0,0,0,.4)",
-              marginTop: 20,
-              marginBottom: 10,
-              borderRadius: 10,
-              borderBottomLeftRadius: pressed ? 0 : null,
-              borderBottomRightRadius: pressed ? 0 : null,
-              overflow: "hidden",
-              backgroundColor: "white",
-            },
-          ]}
-        >
-          {/* <Link to={"/product/" + item.id} style={{textDecoration:"none", flex: 1,}}> */}
-          <View
-            // to={"/product/" + item.idMeal}
-            style={{
-              flex: 1,
-              width: "100%",
-              height: 250,
-              overflow: "hidden",
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
-            }}
-          >
-            <Image
-              style={{ width: "100%", height: "100%" }}
-              source={image ? { uri: image } : imagePath}
-            />
-          </View>
-
-          {/* </Link> */}
-          <View
-            style={{
-              justifyContent: "center",
-              // alignItems: "center",
-              paddingVertical: 10,
-              paddingHorizontal: 5,
-            }}
-          >
-            <Text
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              style={[styles.text, styles.title, { fontSize }]}
-            >
+    <View style={styles.wrapper}>
+      <TouchableOpacity
+        accessibilityRole={canOrder || canViewDetails ? "button" : "image"}
+        accessibilityLabel={title}
+        accessibilityState={{ expanded }}
+        activeOpacity={0.88}
+        disabled={!canOrder && !canViewDetails}
+        onPress={toggleDetails}
+      >
+        <View style={[styles.card, style, { height: cardHeight }]}>
+          <Image
+            accessibilityLabel={`${title} gambar`}
+            source={image ? { uri: image } : imagePath}
+            style={[styles.image, { height: imageHeight }]}
+          />
+          <View style={styles.content}>
+            <Text numberOfLines={2} style={[styles.title, { fontSize }]}>
               {title}
             </Text>
+            {price !== undefined && (
+              <Text style={[styles.price, { fontSize: Math.max(13, fontSize) }]}>
+                Rp {cartTotal(price)}
+              </Text>
+            )}
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              // alignItems: "center",
-              paddingHorizontal: 10,
-              paddingBottom: 10,
-            }}
-          >
-            <View style={{ flex: 1 }}>
-              <TouchableOpacity>
-                <Text
-                  style={{
-                    ...styles.text,
-                    fontWeight: "bold",
-                    fontSize,
-                    color: DarkAccent,
-                  }}
-                >
-                  Rp.{price}
-                </Text>
-              </TouchableOpacity>
+          {(canOrder || canViewDetails) && (
+            <View style={styles.disclosure}>
+              <Text style={styles.disclosureText}>
+                {expanded ? "Tutup" : "Lihat pilihan"}
+              </Text>
+              <Ionicons
+                name={expanded ? "chevron-up" : "chevron-down"}
+                size={16}
+                color={MutedTextColor}
+              />
             </View>
-            {/* <View style={{ flex: 1 }}>
-          <TouchableOpacity onPress={onPress}>
-            <Text
-              numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              style={[
-                styles.text,
-                styles.touchable,
-                { fontSize: isMobile ? _rem(4) : _rem(6.5) },
-              ]}
-            >
-              Add To Cart
-            </Text>
-          </TouchableOpacity>
-        </View> */}
-          </View>
+          )}
         </View>
-      </SmallAnimView>
-      {pressed ? (
-        <SlideInView>
-          <View
-            style={[
-              styles.bottomContainer,
-              {
-                borderBottomLeftRadius: pressed ? 10 : null,
-                borderBottomRightRadius: pressed ? 10 : null,
-                boxShadow: "0px 0px 5px rgba(0,0,0,.4)",
-                width: style.width,
-              },
-            ]}
-          >
-            <TouchableOpacity onPress={onPress}>
-              <Text style={styles.bottomContainerText}>Add To Cart</Text>
+      </TouchableOpacity>
+      {expanded && (
+        <View style={styles.actionRow}>
+          {canOrder && (
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`Tambah ${title} ke keranjang`}
+              onPress={onPress}
+              style={styles.primaryAction}
+            >
+              <Ionicons name="cart-outline" size={16} color={SurfaceColor} />
+              <Text style={styles.primaryActionText}>Tambah</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Link to={"/product/" + item.idMeal} key={item.idMeal}>
-                <Text style={styles.bottomContainerText}>Info</Text>
-              </Link>
-            </TouchableOpacity>
-          </View>
-        </SlideInView>
-      ) : null }
-    </TouchableOpacity>
+          )}
+          {canViewDetails && (
+            <Link
+              accessibilityRole="button"
+              accessibilityLabel={`Lihat detail ${title}`}
+              style={styles.secondaryAction}
+              to={`/product/${item.idMeal}`}
+            >
+              <Text style={styles.secondaryActionText}>Detail</Text>
+              <Ionicons name="arrow-forward" size={16} color={DarkAccent} />
+            </Link>
+          )}
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  text: {
-    textAlign: "center",
+  wrapper: {
+    marginHorizontal: 8,
+    marginBottom: 18,
   },
-  touchable: {
-    color: "white",
-    paddingHorizontal: isMobile ? 5 : 5,
-    paddingVertical: isMobile ? 3 : 5,
-    backgroundColor: AccentColor2,
+  card: {
+    width: "100%",
+    overflow: "hidden",
+    borderRadius: 16,
+    backgroundColor: SurfaceColor,
+    borderWidth: 1,
+    elevation: 3,
+    borderColor: BorderColor,
+    boxShadow: shadow(3),
+  },
+  image: {
+    width: "100%",
+    resizeMode: "cover",
+    backgroundColor: "#e8eee9",
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 14,
+    paddingTop: 10,
+    paddingBottom: 6,
   },
   title: {
-    fontSize: isMobile ? 9 : 18,
     color: LittleDarkAccent,
-    textShadowRadius: 1,
-    textShadowOffset: {
-      width: 1,
-      height: 1,
-    },
-    textShadowColor: "rgba(0,0,0,0.2)",
+    fontWeight: "700",
+    lineHeight: 20,
   },
-  bottomContainer: {
-    flex: 1,
-    padding: 10,
-    marginTop: -10,
-    marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignSelf: "center",
+  price: {
+    color: AccentColor2,
+    fontWeight: "800",
+    marginTop: 5,
+  },
+  disclosure: {
     alignItems: "center",
-    backgroundColor: DarkAccent,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 14,
+    paddingBottom: 11,
   },
-  bottomContainerText: {
-    fontSize: isMobile ? 12 : 14,
-    color: "white",
+  disclosureText: {
+    color: MutedTextColor,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  actionRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "space-between",
+    marginTop: -2,
+    padding: 10,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    backgroundColor: DarkAccent,
+    boxShadow: shadow(3, 0.18),
+  },
+  primaryAction: {
+    alignItems: "center",
+    backgroundColor: AccentColor2,
+    borderRadius: 10,
+    flex: 1,
+    flexDirection: "row",
+    gap: 6,
+    justifyContent: "center",
+    minHeight: 42,
+    paddingHorizontal: 10,
+  },
+  primaryActionText: {
+    color: SurfaceColor,
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  secondaryAction: {
+    alignItems: "center",
+    backgroundColor: AccentColor,
+    borderRadius: 10,
+    flex: 1,
+    flexDirection: "row",
+    gap: 6,
+    justifyContent: "center",
+    minHeight: 42,
+    paddingHorizontal: 10,
+  },
+  secondaryActionText: {
+    color: DarkAccent,
+    fontSize: 13,
+    fontWeight: "800",
   },
 });
 

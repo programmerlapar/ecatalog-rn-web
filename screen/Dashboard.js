@@ -1,62 +1,51 @@
 import React, { useEffect, useState } from "react";
-import { Animated, FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import Fade from "react-reveal/Fade";
-import Slide from "react-reveal/Slide";
 import BottomSheet from "../components/BottomSheet";
 import Cart from "../components/Cart";
 import CategoryList from "../components/CategoryList";
 import Loading from "../components/Loading";
 import ProductList from "../components/ProductList";
 import ProductsModal from "../components/ProductsModal";
-import SideBar from "../components/Sidebar";
-import { DarkAccent, LittleDarkAccent } from "../constant/ColorsConst";
+import {
+  AccentColor,
+  BackgroundColor,
+  DarkAccent,
+  LittleDarkAccent,
+  MutedTextColor,
+  PrimaryColor,
+} from "../constant/ColorsConst";
 import priceInt, { cartTotal } from "../constant/function";
-import { HEADER_MARGIN, isMobile } from "../constant/isMobile";
 import useDimens from "../constant/useDimens";
 import data from "../data/data.json";
 import { fetchAllMenu, fetchCategory, fetchMenu } from "../store/actions/menu";
 
-const PADDING_LEFT = "20%";
+const promoImages = {
+  "paket_1.jpg": require("../assets/paket_1.jpg"),
+  "paket_2.png": require("../assets/paket_2.png"),
+  "paket_3.jpeg": require("../assets/paket_3.jpeg"),
+};
 
 const Dashboard = () => {
   const availCat = useSelector((state) => state.menu.categoryList);
-  const availLatMenu = useSelector((state) => state.menu.latestMenu);
+  const availLatestMenu = useSelector((state) => state.menu.latestMenu);
   const availMenu = useSelector((state) => state.menu.availableMenu);
   const loading = useSelector((state) => state.menu.isFetching);
   const order = useSelector((state) => state.cart.orderItems);
-  const availablePromo = data.Promo;
-  const [promo, setPromo] = useState(availablePromo);
-  const [_width, _height, isWeb] = useDimens();
-  const [visible, setVisible] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
+  const promo = data.Promo || [];
+  const [basePrice] = useState(() => priceInt(15000, 60000));
+  const [_width, , isWeb] = useDimens();
   const [modalVisible, setModalVisible] = useState(false);
   const [productModal, setProductModal] = useState(false);
   const [meals, setMeals] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState([]);
-  const slide = React.useRef(new Animated.Value(-100)).current;
-  const slideAnim = () => {
-    Animated.spring(slide, {
-      toValue: 0,
-      // tension: 2,
-      duration: 5000,
-      useNativeDriver: true,
-      easing: Easing.back,
-    }).start();
-  };
-
-  const BASE_PRICE = priceInt(15000, 60000);
-  const PRICE = cartTotal(BASE_PRICE);
-
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();
-  const _rem = (size) => {
-    if (_height > _width) {
-      return ((size * _width) / 380) * 2;
-    } else {
-      return (size * _height) / 380;
-    }
-  };
+
+  useEffect(() => {
+    dispatch(fetchCategory());
+    dispatch(fetchMenu("starter"));
+  }, [dispatch]);
 
   const categories = (availCat.categories || []).map((category) => ({
     ...category,
@@ -64,326 +53,289 @@ const Dashboard = () => {
     title: category.title ?? category.strCategory,
     image_link: category.image_link ?? category.strCategoryThumb,
   }));
+  const menu = meals ? availLatestMenu?.meals || [] : availMenu?.meals || [];
+  const cardWidth = isWeb ? Math.min(250, Math.max(170, (_width - 112) / 4)) : Math.max(138, (_width - 52) / 2);
+  const cardHeight = isWeb ? 292 : 238;
 
-  // const fetchNewManu = useCallback(async () => {
-  //   // await dispatch(isLoadingHandler());
-
-  //   // dispatch(fetchLatestMenu());
-  // }, []);
-
-  useEffect(async () => {
-    // await fetchNewManu();
-    await dispatch(fetchCategory());
-    await dispatch(fetchMenu("starter"));
-  }, []);
-
-  const modalHandler = async () => {
-    setModalVisible(!modalVisible);
-  };
-
-  const productModalHandler = (item) => {
-    setProductModal(!productModal);
-    if (productModal === false) {
-      setSelectedProduct(item);
-    }
-  };
-
-  const selectedCategoryHandler = (category) => {
+  const selectCategory = (category) => {
     setSelectedCategory(category);
-    dispatch(fetchAllMenu(category.title.toLowerCase()));
     setMeals(true);
+    dispatch(fetchAllMenu(category.title.toLowerCase()));
   };
+
+  const selectProduct = (product) => {
+    setSelectedProduct(product);
+    setProductModal(true);
+  };
+
+  if (loading && !menu.length && !categories.length) {
+    return <Loading />;
+  }
+
   return (
-    <View style={{ flex: 1 }}>
-      {!loading ? (
-        <View>
-          <ProductsModal
-            price={BASE_PRICE}
-            productModal={productModal}
-            productModalHandler={productModalHandler}
-            product={selectedProduct}
-          />
-          <BottomSheet
-            modalHandler={modalHandler}
-            modalVisible={modalVisible}
-            price={BASE_PRICE}
-            productModal={productModal}
-            product={selectedProduct}
-            productModalHandler={productModalHandler}
-            width={_width}
-            height={_height}
-            isWeb={isWeb}
-          />
-          {order.length > 0 ? (
-            <Cart
-              productModal={productModal}
-              productModalHandler={productModalHandler}
-              cartItems={cartItems}
-              onPress={modalHandler}
-              style={[
-                Bar(isWeb).bar,
-                {
-                  bottom: isWeb ? 20 : 75,
-                  top: null,
-                  marginVertical: isMobile ? null : 5,
-                  width: isWeb ? "16%" : "70%",
-                },
-              ]}
-              size={isWeb ? _width * 0.02 : _width * 0.06}
-            />
-          ) : null}
-          <View
-            style={{
-              zIndex: 3,
-              position: "relative",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <SideBar
-              style={Bar(isWeb).bar}
-              size={isWeb ? _width * 0.03 : _width * 0.06}
-              cartHandler={() => setVisible(!visible)}
-              badgeData={cartItems.length}
-            />
+    <View style={styles.page}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={[styles.content, isWeb && styles.webContent]}>
+        <View style={styles.welcome}>
+          <View style={styles.welcomeCopy}>
+            <Text style={styles.welcomeTitle}>Temukan menu favoritmu</Text>
+            <Text style={styles.welcomeDescription}>
+              Pilih hidangan untuk dinikmati sekarang, lalu atur pesananmu dengan mudah.
+            </Text>
           </View>
-          <View style={[styles.body]}>
-            <View
-              style={{
-                // flex: 1,
-                // height: _height / 1.8,
-                // width: _width * 0.8,
-                // alignItems: "center",
-                justifyContent: "center",
-                marginVertical: 10,
-                // flexGrow: 1,
-              }}
-            >
-              <Fade right>
-                <View style={styles.headerFlatlist}>
-                  <Text
-                    style={{
-                      ...styles.headerFlatlist,
-                      paddingLeft: isWeb ? PADDING_LEFT : null,
-                      fontSize: isWeb ? _rem(22) : _rem(12),
-                      color: LittleDarkAccent,
-                      marginTop: 10,
-                    }}
-                  >
-                    Promo Saat ini
-                  </Text>
-                </View>
-              </Fade>
-              <Slide bottom cascade>
-                <FlatList
-                  data={promo}
-                  showsHorizontalScrollIndicator={false}
-                  horizontal
-                  contentContainerStyle={{
-                    paddingLeft: isWeb ? PADDING_LEFT : null,
-                  }}
-                  keyExtractor={(item) => item.pid}
-                  renderItem={({ item }) => {
-                    return (
-                      <ProductList
-                        style={{
-                          width: !isWeb ? 150 : _width / 6,
-                          height: !isWeb ? 350 / 2 : _width / 5 - 20,
-                        }}
-                        fontSize={!isWeb ? _rem(5) : _rem(8)}
-                        title={item.title}
-                        // imagePath={require(`../assets/${item.image_link}`)}
-                        price={PRICE}
-                        onPress={() => { }}
-                        item={item}
-                      />
-                    );
-                  }}
-                />
-              </Slide>
-            </View>
-            <View style={styles.headerFlatlist}>
-              <Fade right>
-                <Text
-                  style={[
-                    styles.headerFlatlistText,
-                    {
-                      fontSize: isWeb ? _rem(22) : _rem(12),
-                      paddingVertical: 10,
-                      paddingLeft: isWeb ? PADDING_LEFT : null,
-                      color: LittleDarkAccent,
-                    },
-                  ]}
-                >
-                  Pilih kategori favoritmu!
-                </Text>
-              </Fade>
-            </View>
-            <Slide bottom cascade>
-              <FlatList
-                horizontal
-                contentContainerStyle={{
-                  flex: 1,
-                  paddingTop: 20,
-                  paddingLeft: isWeb ? PADDING_LEFT : null,
-                }}
-                data={categories}
-                keyExtractor={(item) => item.cid}
-                showsHorizontalScrollIndicator={isWeb ? false : true}
-                renderItem={({ item }) => (
-                  <CategoryList
-                    fontSize={isWeb ? _rem(8) : _rem(5)}
-                    title={item.title.toUpperCase()}
-                    image={item.image_link}
-                    style={{
-                      width: !isMobile ? _width / 8 - 20 : _width / 4 - 20,
-                      height: !isMobile ? _width / 8 - 20 : _width / 4 - 20,
-                      marginVertical: isWeb ? 10 : null,
-                    }}
-                    cid={item.cid}
-                    onPress={() => {
-                      selectedCategoryHandler(item);
-                    }}
-                    selectedCategory={selectedCategory}
-                    item={item}
-                  />
-                )}
-              />
-            </Slide>
-            {!meals ? (
-              <Slide right cascade>
-                <View style={styles.headerFlatlist}>
-                  <Text
-                    style={{
-                      ...styles.headerFlatlist,
-                      fontSize: isWeb ? _rem(22) : _rem(12),
-                      color: LittleDarkAccent,
-                      paddingLeft: isWeb ? PADDING_LEFT : null,
-                    }}
-                  >
-                    Latest Menu
-                  </Text>
-                </View>
-                <FlatList
-                  contentContainerStyle={{
-                    // marginHorizontal: !isWeb ? null : 100,
-                    // paddingBottom: "25%",
-                    justifyContent: isWeb ? null : "center",
-                    alignItems: "center",
-                    paddingLeft: isWeb ? PADDING_LEFT : null,
-                  }}
-                  scrollEnabled
-                  showsVerticalScrollIndicator={false}
-                  numColumns={isMobile ? 2 : 4}
-                  // horizontal
-                  // data={products.reverse().slice(0, 8)}
-                  data={availMenu.meals}
-                  // data={products}
-                  keyExtractor={(item, index) => item.idMeal}
-                  renderItem={({ item }) => (
-                    <ProductList
-                      style={{
-                        width: !isWeb ? 150 : _width / 6,
-                        height: !isWeb ? 350 / 2 : _width / 5 - 20,
-                      }}
-                      fontSize={!isWeb ? _rem(5) : _rem(8)}
-                      title={item.strMeal}
-                      image={item.strMealThumb}
-                      price={PRICE}
-                      onPress={() => productModalHandler(item)}
-                      item={item}
-                    />
-                  )}
-                />
-              </Slide>
-            ) : (
-              <Slide bottom cascade>
-                <FlatList
-                  ListHeaderComponent={
-                    <Slide right>
-                      <Text
-                        style={{
-                          fontSize: isWeb ? _rem(22) : _rem(12),
-                          color: LittleDarkAccent,
-                        }}
-                      >
-                        {selectedCategory.title}
-                      </Text>
-                    </Slide>
-                  }
-                  ListHeaderComponentStyle={{
-                    alignSelf: "flex-start",
-                    marginHorizontal: 20,
-                  }}
-                  contentContainerStyle={{
-                    justifyContent: isWeb ? null : "center",
-                    alignItems: "center",
-                    paddingLeft: isWeb ? PADDING_LEFT : null,
-                  }}
-                  style={{ marginBottom: 40 }}
-                  scrollEnabled
-                  showsVerticalScrollIndicator={false}
-                  numColumns={isMobile ? 2 : 4}
-                  data={availLatMenu.meals}
-                  keyExtractor={(item, index) => item.idMeal}
-                  renderItem={({ item }) => (
-                    <ProductList
-                      style={{
-                        width: !isWeb ? 150 : _width / 6,
-                        height: !isWeb ? 350 / 2 : _width / 5 - 20,
-                      }}
-                      fontSize={!isWeb ? _rem(5) : _rem(8)}
-                      title={item.strMeal}
-                      image={item.strMealThumb}
-                      price={PRICE}
-                      onPress={() => productModalHandler(item)}
-                      item={item}
-                    />
-                  )}
-                />
-              </Slide>
-            )}
+          <View style={styles.priceNote}>
+            <Text style={styles.priceNoteLabel}>Mulai dari</Text>
+            <Text style={styles.priceNoteValue}>Rp {cartTotal(basePrice)}</Text>
           </View>
         </View>
-      ) : (
-        <Loading />
+
+        <SectionTitle title="Promo pilihan" />
+        <FlatList
+          horizontal
+          data={promo}
+          keyExtractor={(item) => item.pid}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalList}
+          renderItem={({ item }) => (
+            <ProductList
+              imagePath={promoImages[item.image_link]}
+              style={{ width: isWeb ? cardWidth : 220, height: isWeb ? 270 : 246 }}
+              fontSize={isWeb ? 15 : 14}
+              title={item.title}
+            />
+          )}
+        />
+
+        <SectionTitle title="Pilih kategori" subtitle="Cari berdasarkan yang sedang kamu inginkan." />
+        <FlatList
+          horizontal
+          data={categories}
+          keyExtractor={(item) => item.cid}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalList}
+          renderItem={({ item }) => (
+            <CategoryList
+              fontSize={isWeb ? 12 : 11}
+              title={item.title}
+              image={item.image_link}
+              style={{ width: isWeb ? 112 : 88, height: isWeb ? 112 : 88 }}
+              cid={item.cid}
+              onPress={() => selectCategory(item)}
+              selectedCategory={selectedCategory}
+              item={item}
+            />
+          )}
+        />
+
+        <View style={styles.menuHeader}>
+          <View>
+            <SectionTitle title={meals ? selectedCategory?.title : "Menu terbaru"} />
+            {!meals && <Text style={styles.menuHint}>Ketuk hidangan untuk melihat pilihan.</Text>}
+          </View>
+          {meals && <Text style={styles.menuCount}>{menu.length} pilihan</Text>}
+        </View>
+
+        {menu.length ? (
+          <FlatList
+            data={menu}
+            keyExtractor={(item) => item.idMeal}
+            numColumns={isWeb ? 4 : 2}
+            scrollEnabled={false}
+            columnWrapperStyle={isWeb ? styles.column : undefined}
+            contentContainerStyle={styles.productGrid}
+            renderItem={({ item }) => (
+              <ProductList
+                style={{ width: cardWidth, height: cardHeight }}
+                fontSize={isWeb ? 15 : 14}
+                title={item.strMeal}
+                image={item.strMealThumb}
+                price={basePrice}
+                onPress={() => selectProduct(item)}
+                item={item}
+              />
+            )}
+          />
+        ) : (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyTitle}>Belum ada menu di sini</Text>
+            <Text style={styles.emptyText}>Coba pilih kategori lain untuk melihat hidangan yang tersedia.</Text>
+          </View>
+        )}
+        </View>
+      </ScrollView>
+
+      {order.length > 0 && (
+        <Cart
+          onPress={() => setModalVisible(true)}
+          size={24}
+          style={[styles.cart, isWeb ? styles.webCart : styles.mobileCart]}
+        />
       )}
+      <ProductsModal
+        price={basePrice}
+        productModal={productModal}
+        productModalHandler={() => setProductModal(false)}
+        product={selectedProduct || {}}
+      />
+      <BottomSheet modalHandler={() => setModalVisible(false)} modalVisible={modalVisible} isWeb={isWeb} width={_width} />
     </View>
   );
 };
 
+const SectionTitle = ({ title, subtitle }) => (
+  <View style={styles.sectionTitle}>
+    <Text style={styles.sectionHeading}>{title}</Text>
+    {subtitle && <Text style={styles.sectionSubtitle}>{subtitle}</Text>}
+  </View>
+);
+
 const styles = StyleSheet.create({
-  body: {
+  page: {
+    backgroundColor: BackgroundColor,
     flex: 1,
-    justifyContent: "center",
-    position: "relative",
-    marginTop: HEADER_MARGIN + 20,
-    backgroundColor: "#fafcfb",
-    overflow: "visible",
   },
-  headerFlatlist: {
-    paddingHorizontal: 20,
-    borderRadius: 20,
+  scrollContent: {
+    flexGrow: 1,
   },
-  headerFlatlistText: {
+  content: {
+    paddingHorizontal: 16,
+    paddingBottom: 88,
+    paddingTop: 22,
+  },
+  webContent: {
+    alignSelf: "center",
+    maxWidth: 1120,
+    paddingHorizontal: 32,
+    width: "100%",
+  },
+  welcome: {
+    alignItems: "center",
+    backgroundColor: DarkAccent,
+    borderRadius: 24,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 32,
+    overflow: "hidden",
+    paddingHorizontal: 24,
+    paddingVertical: 24,
+  },
+  welcomeCopy: {
+    flex: 1,
+    paddingRight: 18,
+  },
+  welcomeTitle: {
+    color: "#ffffff",
+    fontSize: 26,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+    lineHeight: 31,
+  },
+  welcomeDescription: {
+    color: "#d7e3dc",
+    fontSize: 14,
+    lineHeight: 21,
+    marginTop: 8,
+    maxWidth: 500,
+  },
+  priceNote: {
+    alignItems: "flex-end",
+    borderLeftColor: "#587b70",
+    borderLeftWidth: 1,
+    paddingLeft: 20,
+  },
+  priceNoteLabel: {
+    color: "#b9ccc3",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  priceNoteValue: {
+    color: AccentColor,
+    fontSize: 18,
+    fontWeight: "800",
+    marginTop: 4,
+  },
+  sectionTitle: {
+    marginBottom: 12,
+    marginTop: 10,
+  },
+  sectionHeading: {
     color: DarkAccent,
+    fontSize: 21,
+    fontWeight: "800",
+    letterSpacing: -0.2,
+  },
+  sectionSubtitle: {
+    color: MutedTextColor,
+    fontSize: 13,
+    marginTop: 4,
+  },
+  horizontalList: {
+    paddingBottom: 8,
+    paddingRight: 8,
+  },
+  menuHeader: {
+    alignItems: "flex-end",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 24,
+  },
+  menuHint: {
+    color: MutedTextColor,
+    fontSize: 13,
+    marginTop: -5,
+  },
+  menuCount: {
+    color: PrimaryColor,
+    fontSize: 13,
+    fontWeight: "800",
+    marginBottom: 16,
+  },
+  productGrid: {
+    alignItems: "center",
+    paddingTop: 4,
+  },
+  column: {
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  emptyState: {
+    alignItems: "center",
+    backgroundColor: "#f1f3ee",
+    borderRadius: 16,
+    marginTop: 4,
+    paddingHorizontal: 22,
+    paddingVertical: 30,
+  },
+  emptyTitle: {
+    color: DarkAccent,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  emptyText: {
+    color: MutedTextColor,
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 6,
+    maxWidth: 360,
+    textAlign: "center",
+  },
+  cart: {
+    backgroundColor: DarkAccent,
+    borderRadius: 18,
+    boxShadow: "0px 8px 22px rgba(32,49,45,0.22)",
+    minHeight: 64,
+    zIndex: 5,
+  },
+  webCart: {
+    bottom: 24,
+    right: 28,
+    width: 250,
+  },
+  mobileCart: {
+    bottom: 16,
+    left: 16,
+    right: 16,
   },
 });
-const Bar = (isWeb) =>
-  StyleSheet.create({
-    bar: {
-      padding: isWeb ? 20 : 0,
-      paddingVertical: isWeb ? null : 10,
-      top: isWeb ? "40%" : null,
-      left: isWeb ? 20 : null,
-      right: isWeb ? null : null,
-      bottom: isWeb ? null : 20,
-      flexDirection: isWeb ? null : "row",
-      justifyContent: isWeb ? null : "space-evenly",
-      alignSelf: isWeb ? null : "center",
-      width: isWeb ? null : "60%",
-      marginHorizontal: 10,
-    },
-  });
 
 export default Dashboard;
