@@ -13,7 +13,7 @@ const CategoryList = ({ cid, style = {}, onPress, image, title, fontSize = 12, i
       accessibilityLabel={`Pilih kategori ${title}`}
       accessibilityState={{ selected }}
       {...linkInteraction}
-      style={[styles.link, { width: style.width || 96 }]}
+      style={{ ...styles.link, width: style.width || 96 }}
       to={`/category/${cid}`}
     >
       <View style={[styles.container, { backgroundColor: selected ? DarkAccent : SurfaceColor }]}>

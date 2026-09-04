@@ -55,7 +55,7 @@ const Home = () => {
     <Router>
       <View style={styles.app}>
         <View style={styles.topRule} />
-        <View style={styles.header}>
+        <View style={[styles.header, isWeb && styles.webHeader]}>
           <Link accessibilityRole="link" style={styles.brandLink} to="/">
             <Image accessibilityLabel="Logo Snow Motion Cafe" source={require("../assets/cafe.png")} style={styles.logo} />
             <View>
@@ -65,8 +65,8 @@ const Home = () => {
           </Link>
           {isWeb ? (
             <View style={styles.webNavigation}>
-              <MenuBar title="Tentang Kami" menuHandler={() => openModal(1)} isWeb _rem={rem} />
-              <MenuBar title="Kontak" menuHandler={() => openModal(2)} isWeb _rem={rem} />
+              <MenuBar title="Tentang Kami" menuHandler={() => openModal(1)} isWeb _rem={rem} fontSize={14} />
+              <MenuBar title="Kontak" menuHandler={() => openModal(2)} isWeb _rem={rem} fontSize={14} />
             </View>
           ) : (
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Buka menu" onPress={showDrawer} style={styles.menuButton}>
@@ -157,6 +157,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     zIndex: 4,
     boxShadow: "0px 4px 14px rgba(32,49,45,0.14)",
+  },
+  webHeader: {
+    flexWrap: "wrap",
   },
   brandLink: {
     alignItems: "center",
