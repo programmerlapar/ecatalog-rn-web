@@ -10,12 +10,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Route } from "react-router";
 import { ContactModal, CustomModal } from "../components/CustomModal";
 import MenuBar from "../components/MenuBar";
 import { AccentColor, DarkAccent, LittleDarkAccent, SurfaceColor } from "../constant/ColorsConst";
 import useDimens from "../constant/useDimens";
-import { Link, Router } from "../navigation";
+import { Link, Route, Router } from "../navigation";
 import About from "./About";
 import Dashboard from "./Dashboard";
 import Drawer from "./Drawer";

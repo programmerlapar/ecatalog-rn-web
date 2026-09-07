@@ -25,7 +25,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C002",
@@ -52,7 +53,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C003",
@@ -79,7 +81,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C004",
@@ -106,7 +109,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C005",
@@ -133,7 +137,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C006",
@@ -160,7 +165,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C007",
@@ -187,7 +193,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C008",
@@ -214,7 +221,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C009",
@@ -241,7 +249,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C010",
@@ -268,7 +277,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C011",
@@ -295,7 +305,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C012",
@@ -322,7 +333,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C013",
@@ -349,7 +361,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C014",
@@ -376,7 +389,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C015",
@@ -403,7 +417,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C016",
@@ -430,7 +445,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       },
       {
         "id": "C017",
@@ -457,7 +473,8 @@
         "product_type": "",
         "shipping": "",
         "shipping_weight": "",
-        "category": "Bawahan"
+        "category": "Bawahan",
+        "category_id": "3"
       }
     ],
     "categories": [
