@@ -4,6 +4,7 @@ describe("Home entry router", () => {
 
     const webRouter = jest.fn(({ children }) => children);
     const nativeRouter = jest.fn(({ children }) => children);
+    const route = jest.fn(() => null);
     const webLink = ({ children }) => children;
     const nativeLink = ({ children }) => children;
 
@@ -50,17 +51,15 @@ describe("Home entry router", () => {
     jest.doMock("../screen/Dashboard", () => () => null);
     jest.doMock("../screen/About", () => () => null);
     jest.doMock("../screen/Product", () => () => null);
-    jest.doMock("react-router", () => ({
-      Route: () => null,
-    }));
     jest.doMock("react-router-dom", () => ({
       BrowserRouter: webRouter,
       Link: webLink,
-      Route: () => null,
+      Route: route,
     }));
     jest.doMock("react-router-native", () => ({
       NativeRouter: nativeRouter,
       Link: nativeLink,
+      Route: route,
     }));
 
     const React = require("react");
@@ -69,7 +68,7 @@ describe("Home entry router", () => {
 
     renderToStaticMarkup(React.createElement(Home));
 
-    return { webRouter, nativeRouter };
+    return { webRouter, nativeRouter, route };
   };
 
   it("mounts the web router for the web entry", () => {
@@ -84,5 +83,13 @@ describe("Home entry router", () => {
 
     expect(nativeRouter).toHaveBeenCalled();
     expect(webRouter).not.toHaveBeenCalled();
+  });
+
+  it("registers the category route", () => {
+    const { route } = loadHome("web");
+
+    expect(route.mock.calls.map(([props]) => props.path)).toContain(
+      "/category/:id"
+    );
   });
 });
