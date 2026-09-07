@@ -9,3 +9,4 @@ export const Router = isWeb
   ? navigation.BrowserRouter
   : navigation.NativeRouter;
 export const Link = navigation.Link;
+export const Route = navigation.Route;
