@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Animated, FlatList, StyleSheet, Text, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useSelector } from "react-redux";
 import Fade from "react-reveal/Fade";
 import Slide from "react-reveal/Slide";
 import BottomSheet from "../components/BottomSheet";
 import Cart from "../components/Cart";
 import CategoryList from "../components/CategoryList";
-import Loading from "../components/Loading";
 import ProductList from "../components/ProductList";
 import ProductsModal from "../components/ProductsModal";
 import SideBar from "../components/Sidebar";
@@ -14,16 +13,16 @@ import { DarkAccent, LittleDarkAccent } from "../constant/ColorsConst";
 import priceInt, { cartTotal } from "../constant/function";
 import { HEADER_MARGIN, isMobile } from "../constant/isMobile";
 import useDimens from "../constant/useDimens";
+import {
+  categories,
+  products,
+  productsForCategory,
+} from "../data/catalog";
 import data from "../data/data.json";
-import { fetchAllMenu, fetchCategory, fetchMenu } from "../store/actions/menu";
 
 const PADDING_LEFT = "20%";
 
 const Dashboard = () => {
-  const availCat = useSelector((state) => state.menu.categoryList);
-  const availLatMenu = useSelector((state) => state.menu.latestMenu);
-  const availMenu = useSelector((state) => state.menu.availableMenu);
-  const loading = useSelector((state) => state.menu.isFetching);
   const order = useSelector((state) => state.cart.orderItems);
   const availablePromo = data.Promo;
   const [promo, setPromo] = useState(availablePromo);
@@ -35,21 +34,9 @@ const Dashboard = () => {
   const [meals, setMeals] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState([]);
-  const slide = React.useRef(new Animated.Value(-100)).current;
-  const slideAnim = () => {
-    Animated.spring(slide, {
-      toValue: 0,
-      // tension: 2,
-      duration: 5000,
-      useNativeDriver: true,
-      easing: Easing.back,
-    }).start();
-  };
-
   const BASE_PRICE = priceInt(15000, 60000);
   const PRICE = cartTotal(BASE_PRICE);
 
-  const dispatch = useDispatch();
   const _rem = (size) => {
     if (_height > _width) {
       return ((size * _width) / 380) * 2;
@@ -57,25 +44,6 @@ const Dashboard = () => {
       return (size * _height) / 380;
     }
   };
-
-  const categories = (availCat.categories || []).map((category) => ({
-    ...category,
-    cid: category.cid ?? category.idCategory,
-    title: category.title ?? category.strCategory,
-    image_link: category.image_link ?? category.strCategoryThumb,
-  }));
-
-  // const fetchNewManu = useCallback(async () => {
-  //   // await dispatch(isLoadingHandler());
-
-  //   // dispatch(fetchLatestMenu());
-  // }, []);
-
-  useEffect(async () => {
-    // await fetchNewManu();
-    await dispatch(fetchCategory());
-    await dispatch(fetchMenu("starter"));
-  }, []);
 
   const modalHandler = async () => {
     setModalVisible(!modalVisible);
@@ -90,13 +58,11 @@ const Dashboard = () => {
 
   const selectedCategoryHandler = (category) => {
     setSelectedCategory(category);
-    dispatch(fetchAllMenu(category.title.toLowerCase()));
     setMeals(true);
   };
   return (
     <View style={{ flex: 1 }}>
-      {!loading ? (
-        <View>
+      <View>
           <ProductsModal
             price={BASE_PRICE}
             productModal={productModal}
@@ -277,7 +243,7 @@ const Dashboard = () => {
                   numColumns={isMobile ? 2 : 4}
                   // horizontal
                   // data={products.reverse().slice(0, 8)}
-                  data={availMenu.meals}
+                  data={products}
                   // data={products}
                   keyExtractor={(item, index) => item.idMeal}
                   renderItem={({ item }) => (
@@ -324,7 +290,12 @@ const Dashboard = () => {
                   scrollEnabled
                   showsVerticalScrollIndicator={false}
                   numColumns={isMobile ? 2 : 4}
-                  data={availLatMenu.meals}
+                  data={productsForCategory(selectedCategory.cid)}
+                  ListEmptyComponent={
+                    <Text style={{ color: LittleDarkAccent, marginTop: 20 }}>
+                      Tidak ada produk dalam kategori ini.
+                    </Text>
+                  }
                   keyExtractor={(item, index) => item.idMeal}
                   renderItem={({ item }) => (
                     <ProductList
@@ -344,10 +315,7 @@ const Dashboard = () => {
               </Slide>
             )}
           </View>
-        </View>
-      ) : (
-        <Loading />
-      )}
+      </View>
     </View>
   );
 };
