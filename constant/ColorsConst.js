@@ -1,10 +1,13 @@
-export const PrimaryColor = '#6199ad';
-export const AccentColor = '#11fe92';
-export const AccentColor2 = '#f03101';
-export const DarkAccent = '#2b302e';
-export const LittleDarkAccent = '#5b5b5b';
+export const PrimaryColor = "#2f756d";
+export const AccentColor = "#f2b84b";
+export const AccentColor2 = "#b9482f";
+export const DarkAccent = "#20312d";
+export const LittleDarkAccent = "#52615d";
+export const BackgroundColor = "#fbfaf6";
+export const SurfaceColor = "#ffffff";
+export const MutedSurfaceColor = "#f1f3ee";
+export const BorderColor = "#e1e7e0";
+export const MutedTextColor = "#6d7b76";
 
-export const shadow = (s,o) => {
-    return `0px 0px ${s}px rgb(0,0,0,${o})`
-
-}
+export const shadow = (size, opacity = 0.12) =>
+  `0px 6px ${size * 2}px rgba(32,49,45,${opacity})`;

@@ -1,185 +1,236 @@
 import React from "react";
 import {
+  FlatList,
   Modal,
   StyleSheet,
   Text,
-  ScrollView,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  FlatList,
-  TouchableOpacity,
 } from "react-native";
 import { useSelector } from "react-redux";
-import { DarkAccent } from "../constant/ColorsConst";
+import {
+  AccentColor,
+  BackgroundColor,
+  BorderColor,
+  DarkAccent,
+  LittleDarkAccent,
+  MutedTextColor,
+  SurfaceColor,
+} from "../constant/ColorsConst";
 import { cartTotal } from "../constant/function";
-import ProductsModal from "./ProductsModal";
 
-const BottomSheet = ({
-  modalHandler,
-  modalVisible,
-  width,
-  height,
-  isWeb,
-  productModal,
-  productModalHandler,
-  price,
-  product,
-}) => {
+const BottomSheet = ({ modalHandler, modalVisible, width, isWeb }) => {
   const order = useSelector((state) => state.cart.orderItems);
-  const [selectedP, setSelectedP] = React.useState([]);
-  let orderList = order.slice();
-
-  function getCartItemsCount() {
-    let itemCount = orderList.reduce((a, b) => a + (b.qty || 0), 0);
-
-    return itemCount;
-  }
-
-  function getTotalPrice() {
-    let total = orderList.reduce((a, b) => a + (b.total || 0), 0);
-    return cartTotal(total);
-  }
+  const itemCount = order.reduce((total, item) => total + (item.qty || 0), 0);
+  const total = order.reduce((sum, item) => sum + (item.total || 0), 0);
 
   return (
     <Modal
+      animationType="slide"
       onRequestClose={modalHandler}
       visible={modalVisible}
-      animationType="fade"
       transparent
     >
-      {productModal == true && (
-        <ProductsModal
-          price={price}
-          productModal={productModal}
-          productModalHandler={productModalHandler}
-          product={product}
-        />
-      )}
-
-      <TouchableWithoutFeedback onPress={modalHandler}>
-        <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "rgba(0,0,0,0.1)",
-          }}
-        >
-          <View
-            style={[
-              styles.container,
-              {
-                width: isWeb ? width / 2 : "100%",
-                height: "50%",
-                left: isWeb ? 20: 0,
-              },
-            ]}
-          >
-            <View style={{ paddingHorizontal: 20, paddingTop: 20 }}>
-              <Text style={styles.headerText}>Keranjang</Text>
+      <View style={styles.overlay}>
+        <TouchableWithoutFeedback onPress={modalHandler}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
+        <View style={[styles.container, { width: isWeb ? Math.min(width * 0.56, 560) : "100%" }]}>
+          <View style={styles.handle} />
+          <View style={styles.header}>
+            <View>
+              <Text style={styles.headerText}>Pesananmu</Text>
+              <Text style={styles.headerHint}>{itemCount} item siap dinikmati</Text>
             </View>
-            <ScrollView style={{ padding: 20 }}>
-              <FlatList
-                scrollEnabled={true}
-                data={orderList}
-                keyExtractor={(item) => item.idMeal}
-                renderItem={({ item, index }) => {
-                  return (
-                    <TouchableOpacity
-                      onPress={() => {
-                        productModalHandler(item);
-                      }}
-                    >
-                      <View
-                        key={index}
-                        style={
-                          {
-                            // justifyContent: "flex-start",
-                          }
-                        }
-                      >
-                        <View
-                          style={{
-                            flex: 1,
-                            flexDirection: "row",
-                            // alignItems: "center",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <View style={{ flexDirection: "row" }}>
-                            <Text style={styles.contentText}>{item.qty}</Text>
-                            <Text style={styles.contentText}>
-                              {item.strMeal}
-                            </Text>
-                          </View>
-                          <View>
-                            <Text style={styles.contentText}>
-                              Rp. {cartTotal(item.total)}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-            </ScrollView>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                backgroundColor: "gold",
-              }}
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Tutup keranjang"
+              onPress={modalHandler}
+              style={styles.closeButton}
             >
-              <Text
-                style={[
-                  styles.headerText,
-                  { padding: 20, color: DarkAccent, fontWeight: "bold" },
-                ]}
-              >
-                {getCartItemsCount()} Items
-              </Text>
-              <Text
-                style={[
-                  styles.headerText,
-                  { padding: 20, color: DarkAccent, fontWeight: "bold" },
-                ]}
-              >
-                Total Rp. {getTotalPrice()}
-              </Text>
+              <Text style={styles.closeText}>Tutup</Text>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            data={order}
+            keyExtractor={(item) => item.idMeal}
+            contentContainerStyle={order.length ? styles.list : styles.emptyList}
+            ListEmptyComponent={
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyTitle}>Keranjang masih kosong</Text>
+                <Text style={styles.emptyText}>Pilih hidangan dari menu untuk mulai memesan.</Text>
+              </View>
+            }
+            renderItem={({ item }) => (
+              <View style={styles.itemRow}>
+                <View style={styles.itemInfo}>
+                  <Text style={styles.itemQuantity}>{item.qty}x</Text>
+                  <Text numberOfLines={2} style={styles.itemTitle}>{item.strMeal}</Text>
+                </View>
+                <Text style={styles.itemPrice}>Rp {cartTotal(item.total)}</Text>
+              </View>
+            )}
+          />
+
+          <View style={styles.summary}>
+            <View>
+              <Text style={styles.summaryLabel}>Total pesanan</Text>
+              <Text style={styles.summaryValue}>Rp {cartTotal(total)}</Text>
             </View>
+            <TouchableOpacity accessibilityRole="button" style={styles.orderButton} onPress={modalHandler}>
+              <Text style={styles.orderButtonText}>Selesai</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     </Modal>
   );
 };
 
-export default BottomSheet;
-
 const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    boxShadow: "2px 2px 10px rgba(0,0,0,0.2)",
+  overlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  backdrop: {
+    backgroundColor: "rgba(20,35,31,0.48)",
     bottom: 0,
     left: 0,
+    position: "absolute",
     right: 0,
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-    backgroundColor: DarkAccent,
-    justifyContent: "space-between",
+    top: 0,
   },
-  imageBg: {
-    backgroundColor: "blue",
+  container: {
+    alignSelf: "center",
+    backgroundColor: BackgroundColor,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: "78%",
+    minHeight: 260,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+  handle: {
+    alignSelf: "center",
+    backgroundColor: BorderColor,
+    borderRadius: 4,
+    height: 4,
+    marginBottom: 18,
+    width: 42,
+  },
+  header: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
   },
   headerText: {
-    color: "white",
-    fontSize: 20,
-    marginBottom: 5,
+    color: DarkAccent,
+    fontSize: 22,
+    fontWeight: "800",
   },
-  contentText: {
-    color: "white",
+  headerHint: {
+    color: MutedTextColor,
+    fontSize: 13,
+    marginTop: 3,
+  },
+  closeButton: {
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: 8,
+  },
+  closeText: {
+    color: DarkAccent,
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  list: {
+    paddingBottom: 18,
+  },
+  emptyList: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 20,
+  },
+  emptyState: {
+    alignItems: "center",
+    padding: 20,
+  },
+  emptyTitle: {
+    color: DarkAccent,
     fontSize: 16,
-    marginRight: 5,
+    fontWeight: "800",
+  },
+  emptyText: {
+    color: MutedTextColor,
+    fontSize: 13,
+    marginTop: 6,
+    textAlign: "center",
+  },
+  itemRow: {
+    alignItems: "center",
+    borderBottomColor: BorderColor,
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    minHeight: 58,
+    paddingVertical: 9,
+  },
+  itemInfo: {
+    alignItems: "flex-start",
+    flex: 1,
+    flexDirection: "row",
+    paddingRight: 12,
+  },
+  itemQuantity: {
+    color: DarkAccent,
+    fontSize: 14,
+    fontWeight: "800",
+    marginRight: 10,
+  },
+  itemTitle: {
+    color: LittleDarkAccent,
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  itemPrice: {
+    color: DarkAccent,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  summary: {
+    alignItems: "center",
+    borderTopColor: BorderColor,
+    borderTopWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 18,
+  },
+  summaryLabel: {
+    color: MutedTextColor,
+    fontSize: 12,
+  },
+  summaryValue: {
+    color: DarkAccent,
+    fontSize: 20,
+    fontWeight: "800",
+    marginTop: 3,
+  },
+  orderButton: {
+    backgroundColor: AccentColor,
+    borderRadius: 12,
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: 22,
+  },
+  orderButtonText: {
+    color: DarkAccent,
+    fontSize: 14,
+    fontWeight: "800",
   },
 });
+
+export default BottomSheet;

@@ -1,18 +1,19 @@
 import React from "react";
 import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
 import _rem from "../constant/adjustedWindow";
-import { DarkAccent } from "../constant/ColorsConst";
+import { DarkAccent, MutedTextColor } from "../constant/ColorsConst";
 import useDimens from "../constant/useDimens";
 
 const Loading = () => {
-  const [_height, _width, isWeb] = useDimens();
+  const [_width, _height, isWeb] = useDimens();
   return (
-    <View style={styles.main}>
+    <View style={styles.main} accessibilityRole="progressbar" accessibilityLabel="Memuat menu">
       <Image
-        style={[styles.image, { height: isWeb ? _height/3 : _height/2, width: isWeb ? _width : _width/2 }]}
+        accessibilityLabel="Ilustrasi donat"
+        style={[styles.image, { height: isWeb ? 180 : 140, width: isWeb ? 180 : 140 }]}
         source={require("../assets/donut.png")}
       />
-      <Text style={[styles.text, { fontSize: _rem(20) }]}>Please wait...</Text>
+      <Text style={[styles.text, { fontSize: isWeb ? 18 : _rem(10) }]}>Memuat menu...</Text>
       <ActivityIndicator color={DarkAccent} />
     </View>
   );
@@ -21,7 +22,7 @@ const Loading = () => {
 export default Loading;
 
 const styles = StyleSheet.create({
-  main: { flex: 1, alignItems: "center", justifyContent: "center" },
-  image: { marginTop: 100,},
-  text: { fontWeight: "400", marginBottom: 10 },
+  main: { flex: 1, minHeight: 420, alignItems: "center", justifyContent: "center", backgroundColor: "#fbfaf6" },
+  image: { marginBottom: 18 },
+  text: { color: MutedTextColor, fontWeight: "600", marginBottom: 10 },
 });
