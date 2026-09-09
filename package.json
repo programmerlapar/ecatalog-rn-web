@@ -2,7 +2,9 @@
   "scripts": {
     "prestart": "node scripts/ensure-native-project.js",
     "start": "expo start --dev-client",
+    "preandroid": "node scripts/ensure-native-project.js",
     "android": "react-native run-android",
+    "preios": "node scripts/ensure-native-project.js",
     "ios": "react-native run-ios",
     "web": "expo start --web",
     "build:web": "expo export --platform web",
