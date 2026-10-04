@@ -2,6 +2,9 @@
   command = "yarn install --frozen-lockfile && npx expo export --platform web"
   publish = "dist"
 
+[build.environment]
+  NODE_VERSION = "20.15.0"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
