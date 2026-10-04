@@ -35,6 +35,26 @@ describe("menu requests", () => {
     expect(dispatch).toHaveBeenLastCalledWith({ type: IS_LOADING_FALSE, isFetching: false });
   });
 
+  it("clears loading when the network request rejects", async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error("Network request failed"));
+    const dispatch = jest.fn();
+
+    await expect(fetchLatestMenu()(dispatch)).rejects.toThrow("Network request failed");
+
+    expect(dispatch).toHaveBeenLastCalledWith({ type: IS_LOADING_FALSE, isFetching: false });
+  });
+
+  it("clears loading when starting the network request throws", async () => {
+    global.fetch = jest.fn(() => {
+      throw new Error("Network request could not start");
+    });
+    const dispatch = jest.fn();
+
+    await expect(fetchLatestMenu()(dispatch)).rejects.toThrow("Network request could not start");
+
+    expect(dispatch).toHaveBeenLastCalledWith({ type: IS_LOADING_FALSE, isFetching: false });
+  });
+
   it("rejects an empty detail response instead of leaving the detail screen loading", async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ meals: [] }) });
     const dispatch = jest.fn();

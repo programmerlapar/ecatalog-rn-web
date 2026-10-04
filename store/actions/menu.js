@@ -5,25 +5,22 @@ export const SET_DETAIL_MENU = "SET_DETAIL_MENU";
 export const IS_LOADING = "IS_LOADING";
 export const IS_LOADING_FALSE = "IS_LOADING_FALSE";
 
-const requestJson = (dispatch, url, onSuccess) => {
+const requestJson = async (dispatch, url, onSuccess) => {
   dispatch({ type: IS_LOADING, isFetching: true });
 
-  return fetch(url)
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error(`Menu request failed with status ${res.status}`);
-      }
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Menu request failed with status ${res.status}`);
+    }
 
-      return res.json();
-    })
-    .then((json) => {
-      dispatch(onSuccess(json));
-      return json;
-    })
-    .catch((err) => {
-      dispatch({ type: IS_LOADING_FALSE, isFetching: false });
-      throw err;
-    });
+    const json = await res.json();
+    dispatch(onSuccess(json));
+    return json;
+  } catch (err) {
+    dispatch({ type: IS_LOADING_FALSE, isFetching: false });
+    throw err;
+  }
 };
 
 export const fetchCategory = () => {
