@@ -46,7 +46,7 @@ const Product = ({ match, rem }) => {
     );
   }
 
-  if (requesting || loading || !detailReady) {
+  if (requesting || loading !== false || !detailReady) {
     return <Loading />;
   }
 
