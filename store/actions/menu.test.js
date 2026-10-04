@@ -2,6 +2,7 @@ import {
   fetchAllMenu,
   fetchDetailMenu,
   fetchLatestMenu,
+  fetchMenu,
   IS_LOADING,
   IS_LOADING_FALSE,
   SET_LATEST_MENU,
@@ -24,6 +25,16 @@ describe("menu requests", () => {
     expect(global.fetch).toHaveBeenCalledWith("https://www.themealdb.com/api/json/v1/1/search.php?f=d");
     expect(dispatch).toHaveBeenNthCalledWith(1, { type: IS_LOADING, isFetching: true });
     expect(dispatch).toHaveBeenNthCalledWith(2, { type: SET_LATEST_MENU, latestMenu: response });
+  });
+
+  it("clears loading after a successful category menu request", async () => {
+    const response = { meals: [{ idMeal: "1" }] };
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => response });
+    const dispatch = jest.fn();
+
+    await expect(fetchMenu("Dessert")(dispatch)).resolves.toEqual(response);
+
+    expect(dispatch).toHaveBeenLastCalledWith({ type: IS_LOADING_FALSE, isFetching: false });
   });
 
   it("clears loading and rejects when a menu request fails", async () => {

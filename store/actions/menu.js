@@ -18,6 +18,7 @@ const requestJson = (dispatch, url, onSuccess) => {
     })
     .then((json) => {
       dispatch(onSuccess(json));
+      dispatch({ type: IS_LOADING_FALSE, isFetching: false });
       return json;
     })
     .catch((err) => {
