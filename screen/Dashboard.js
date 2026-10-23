@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import BottomSheet from "../components/BottomSheet";
 import Cart from "../components/Cart";
 import CategoryList from "../components/CategoryList";
+import Loading from "../components/Loading";
 import ProductList from "../components/ProductList";
 import ProductsModal from "../components/ProductsModal";
 import {
@@ -17,8 +18,9 @@ import {
 } from "../constant/ColorsConst";
 import priceInt, { cartTotal } from "../constant/function";
 import useDimens from "../constant/useDimens";
-import { categories, products, productsForCategory } from "../data/catalog";
 import data from "../data/data.json";
+import { categoriesFromApi, mealsFromApi } from "../data/food";
+import { fetchCategory, fetchLatestMenu, fetchMenu } from "../store/actions/menu";
 
 const promoImages = {
   "paket_1.jpg": require("../assets/paket_1.jpg"),
@@ -30,23 +32,39 @@ const promoImages = {
 const basePrice = priceInt(15000, 60000);
 
 const Dashboard = ({ categoryId }) => {
+  const dispatch = useDispatch();
   const order = useSelector((state) => state.cart.orderItems);
+  const { availableMenu, categoryList, isFetching, latestMenu } = useSelector((state) => state.menu);
   const promo = data.Promo || [];
   const [_width, , isWeb] = useDimens();
   const [modalVisible, setModalVisible] = useState(false);
   const [productModal, setProductModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const categories = categoriesFromApi(categoryList);
+  const latestProducts = mealsFromApi(latestMenu);
+  const categoryProducts = mealsFromApi(availableMenu);
   const routeCategory = categoryId
     ? categories.find((category) => String(category.cid) === String(categoryId))
     : null;
   const activeCategory = routeCategory || selectedCategory;
-  const categoryNotFound = Boolean(categoryId) && !routeCategory;
-  const menu = activeCategory ? productsForCategory(activeCategory.cid) : products;
+  const categoryNotFound = Boolean(categoryId) && Array.isArray(categoryList?.categories) && !routeCategory;
+  const menu = activeCategory ? categoryProducts : latestProducts;
   const columns = isWeb && _width >= 720 ? 4 : 2;
   const contentWidth = Math.min(_width, 1120) - (isWeb ? 64 : 32);
   const cardWidth = Math.max(0, Math.floor((contentWidth - columns * 16) / columns));
   const cardHeight = isWeb ? 292 : 238;
+
+  useEffect(() => {
+    dispatch(fetchCategory());
+    dispatch(fetchLatestMenu());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (activeCategory) {
+      dispatch(fetchMenu(activeCategory.title));
+    }
+  }, [activeCategory?.cid, activeCategory?.title, dispatch]);
 
   const selectCategory = (category) => {
     setSelectedCategory(category);
@@ -59,8 +77,12 @@ const Dashboard = ({ categoryId }) => {
 
   return (
     <View style={styles.page}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={[styles.content, isWeb && styles.webContent]}>
+      {isFetching && !menu.length ? (
+        <Loading />
+      ) : (
+        <>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={[styles.content, isWeb && styles.webContent]}>
           <View style={styles.welcome}>
             <View style={styles.welcomeCopy}>
               <Text style={styles.welcomeTitle}>Temukan menu favoritmu</Text>
@@ -152,23 +174,25 @@ const Dashboard = ({ categoryId }) => {
               <Text style={styles.emptyText}>Coba pilih kategori lain untuk melihat hidangan yang tersedia.</Text>
             </View>
           )}
-        </View>
-      </ScrollView>
+          </View>
+        </ScrollView>
 
-      {order.length > 0 && (
-        <Cart
-          onPress={() => setModalVisible(true)}
-          size={24}
-          style={[styles.cart, isWeb ? styles.webCart : styles.mobileCart]}
+        {order.length > 0 && (
+          <Cart
+            onPress={() => setModalVisible(true)}
+            size={24}
+            style={[styles.cart, isWeb ? styles.webCart : styles.mobileCart]}
+          />
+        )}
+        <ProductsModal
+          price={basePrice}
+          productModal={productModal}
+          productModalHandler={() => setProductModal(false)}
+          product={selectedProduct || {}}
         />
+        <BottomSheet modalHandler={() => setModalVisible(false)} modalVisible={modalVisible} isWeb={isWeb} width={_width} />
+        </>
       )}
-      <ProductsModal
-        price={basePrice}
-        productModal={productModal}
-        productModalHandler={() => setProductModal(false)}
-        product={selectedProduct || {}}
-      />
-      <BottomSheet modalHandler={() => setModalVisible(false)} modalVisible={modalVisible} isWeb={isWeb} width={_width} />
     </View>
   );
 };
