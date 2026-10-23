@@ -47,35 +47,47 @@ export const fetchLatestMenu = () => {
 
 export const fetchMenu = (cid) => {
   return (dispatch) => {
-    return requestJson(dispatch, `https://www.themealdb.com/api/json/v1/1/filter.php?c=${cid}`, (json) => ({
-      type: SET_MENU,
-      availableMenu: json,
-    }));
+    return requestJson(
+      dispatch,
+      `https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(cid)}`,
+      (json) => ({
+        type: SET_MENU,
+        availableMenu: json,
+      })
+    );
   };
 };
 
 export const fetchAllMenu = (cid) => {
   return (dispatch) => {
-    return requestJson(dispatch, `https://www.themealdb.com/api/json/v1/1/filter.php?c=${cid}`, (json) => ({
-      type: SET_LATEST_MENU,
-      latestMenu: json,
-    }));
+    return requestJson(
+      dispatch,
+      `https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(cid)}`,
+      (json) => ({
+        type: SET_LATEST_MENU,
+        latestMenu: json,
+      })
+    );
   };
 };
 
 export const fetchDetailMenu = (id) => {
   return (dispatch) => {
-    return requestJson(dispatch, `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`, (json) => {
-      if (!json.meals?.[0]) {
-        throw new Error("Menu detail not found");
-      }
+    return requestJson(
+      dispatch,
+      `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${encodeURIComponent(id)}`,
+      (json) => {
+        if (!json.meals?.[0]) {
+          throw new Error("Menu detail not found");
+        }
 
-      return {
-        type: SET_DETAIL_MENU,
-        detailMenu: json.meals[0],
-        isFetching: false,
-      };
-    });
+        return {
+          type: SET_DETAIL_MENU,
+          detailMenu: json.meals[0],
+          isFetching: false,
+        };
+      }
+    );
   };
 };
 
