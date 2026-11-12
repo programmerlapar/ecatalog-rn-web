@@ -3,20 +3,21 @@ import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons";
 import { AccentColor2, BorderColor, MutedTextColor, SurfaceColor } from "../constant/ColorsConst";
 
-const SideBar = ({ style, size = 22 }) => {
-  const FB_LINK = "https://web.facebook.com/bajubayiluwuk/shop/";
-  const WA_LINK =
-    "https://wa.me/+6285343638747?text=Kak+Kiki+saya+mau+ecer+baju+nih..";
-  const socials = [
-    { label: "Facebook", icon: "logo-facebook", link: FB_LINK },
-    { label: "Instagram", icon: "logo-instagram", link: "https://www.instagram.com/bajubayiluwuk" },
-    { label: "WhatsApp", icon: "logo-whatsapp", link: WA_LINK },
-  ];
+const SOCIAL_LINKS = [
+  { label: "Facebook", icon: "logo-facebook", link: "https://web.facebook.com/bajubayiluwuk/shop/" },
+  { label: "Instagram", icon: "logo-instagram", link: "https://www.instagram.com/bajubayiluwuk" },
+  {
+    label: "WhatsApp",
+    icon: "logo-whatsapp",
+    link: "https://wa.me/+6285343638747?text=Kak+Kiki+saya+mau+ecer+baju+nih..",
+  },
+];
 
+const SideBar = ({ style, size = 22 }) => {
   return (
     <View style={[styles.sidebar, style]}>
       <Text style={styles.label}>Ikuti kami</Text>
-      {socials.map((social) => (
+      {SOCIAL_LINKS.map((social) => (
         <TouchableOpacity
           key={social.label}
           accessibilityRole="link"
