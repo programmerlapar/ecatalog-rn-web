@@ -42,9 +42,17 @@ describe("Dashboard responsive product grid", () => {
           cart: { orderItems: [] },
           menu: {
             availableMenu: { meals: [{ idMeal: "1", strMeal: "Pasta", strMealThumb: "pasta.png" }] },
-            categoryList: { categories: [] },
+            categoryList: {
+              categories: [
+                {
+                  idCategory: "1",
+                  strCategory: "Beef",
+                  strCategoryThumb: "beef.png",
+                },
+              ],
+            },
             isFetching: false,
-            latestMenu: { meals: [] },
+            latestMenu: { meals: [{ idMeal: "2", strMeal: "Beef and Mustard Pie", strMealThumb: "pie.png" }] },
           },
         }),
     }));
@@ -58,6 +66,7 @@ describe("Dashboard responsive product grid", () => {
     jest.doMock("../store/actions/menu", () => ({
       fetchCategory: () => ({ type: "FETCH_CATEGORY" }),
       fetchLatestMenu: () => ({ type: "FETCH_LATEST_MENU" }),
+      fetchMenu: () => ({ type: "FETCH_MENU" }),
     }));
     jest.doMock("../assets/paket_1.jpg", () => "paket-1.jpg");
     jest.doMock("../assets/paket_2.png", () => "paket-2.png");
@@ -96,5 +105,6 @@ describe("Dashboard responsive product grid", () => {
     expect(wideGrid.props.numColumns).toBe(4);
     expect(narrowGrid.props.numColumns).toBe(2);
     expect(wideGrid.key).not.toBe(narrowGrid.key);
+    expect(wideGrid.props.data[0].strMeal).toBe("Beef and Mustard Pie");
   });
 });
